@@ -2,39 +2,55 @@
  * Created by ANDREW on 21/03/14.
  */
 
+/** Creates the Game Object, which is essentially used as a state class within Phaser
+ * This ones job is to run the main game, instantiate all objects related to the main game
+ * and control the game flow.
+ *@constructor
+ *@param {Object} game a link to an instantiated Phaser Game Object */
 GameState.Game = function (game) {
-     this.inversionTimer = 0;
-     this.inversionCooldown = 500;
+     this.player = null;
 };
 
 GameState.Game.prototype = {
 
+    /**Initializes all of the variables and objects required for this state
+     * @private
+     * @function */
     create: function () {
-        // adding a sprite to the player, positioning, changing the images center to it's
-        // center instead of far left and Enabling Physics for the player
-        this.player = game.add.sprite(game.world.centerX, 0, 'player');
-        this.player.scale.x = 2;
-        this.player.scale.y = 2;
-        this.player.anchor.set(0.5);
-        this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
-        this.player.body.collideWorldBounds = true;
-        this.player.body.drag.set(20); // adds an opposing physical force to the object so it doesn't infinitely move
-        this.player.body.gravity.y = 50;
+        //posX, posY, scaleX, scaleY, gravity, drag, playerSprite, phaser game object
+        this.player = new RunnerPC(0.0, 0.0, 2.0, 2.0, 50.0, 0.0, 'player', game);
+
+        this.boostButton = this.add.button(70, 565, 'boostButton', this.player.boost, this.player, 0, 0, 0, 0);
+        this.boostButton.anchor.setTo(0.5, 0.5); // changes the point where its positioned from the Anchor point
+        this.boostButton.scale.x = 1.5;
+        this.boostButton.scale.y = 1.5;
+
+        this.invertButton = this.add.button(730, 565, 'invertGravityButton', this.player.invertGravity, this.player, 0, 0, 0, 0);
+        this.invertButton.anchor.setTo(0.5, 0.5); // changes the point where its positioned from the Anchor point
+        this.invertButton.scale.x = 1.5;
+        this.invertButton.scale.y = 1.5;
+
+        this.scoreText = game.add.text(400, 575, 'Score ' + this.player.getScore(), { font: '24px Impact', fill: '#f00' });
+        this.scoreText.anchor.set(0.5, 0.5);
     },
 
+    /**Runs the update code for the Game class, input, score incrementation, player movement etc.
+     * @private
+     * @function */
     update: function () {
 
-        this.inversionTimer += this.game.time.elapsed;
+        this.player.update();
+
+        this.scoreText.text = 'Score ' + this.player.getScore();
 
         if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)){
-            this.player.body.velocity.x = -50;
+            this.player.updateVelocity(-50, 0);
         } else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
-            this.player.body.velocity.x = 50;
+            this.player.updateVelocity(50, 0);
         }
 
-        if (game.input.keyboard.isDown(Phaser.Keyboard.UP) && this.inversionTimer >= this.inversionCooldown){
-            this.player.body.gravity.y = -this.player.body.gravity.y;
-            this.inversionTimer = 0;
+        if (game.input.keyboard.isDown(Phaser.Keyboard.UP)){
+            this.player.invertGravity();
         }
     }
 
