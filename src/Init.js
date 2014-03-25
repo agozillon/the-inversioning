@@ -64,10 +64,8 @@ GameState.Init.prototype = {
             this.game.scale.pageAlignHorizontally = true;
             this.game.scale.pageAlignVertically = true;
             this.game.scale.forceOrientation(true, false);
-            //   this.game.scale.hasResized.add(this.gameResized, this);
-            this.game.scale.enterIncorrectOrientation.add(this.enterIncorrectOrientation, this);
-            this.game.scale.leaveIncorrectOrientation.add(this.leaveIncorrectOrientation, this);
             this.game.scale.setScreenSize(true);
+            this.game.scale.refresh();
         }
 
         // the relevant windows created and all preloads have started, switch to menu
