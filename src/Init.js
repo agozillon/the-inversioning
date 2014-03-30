@@ -28,6 +28,8 @@ GameState.Init.prototype = {
         this.game.load.image('boostButton', 'src/images/boostButton.png');
         this.game.load.image('invertGravityButton', 'src/images/invertGravityButton.png');
         this.game.load.image('tutorialDisplay', 'src/images/tutorial.png');
+        this.game.load.image('platform', 'src/images/platform.png');
+        this.game.load.image('platformMetal', 'src/images/platformMetal.png');
         this.game.load.spritesheet('playButtonSpriteSheet', 'src/images/playButtonSpriteSheet.png', 100, 50, 2);
         this.game.load.spritesheet('tutorialButtonSpriteSheet', 'src/images/tutorialButtonSpriteSheet.png', 100, 50, 2);
         this.game.load.spritesheet('highscoresButtonSpriteSheet', 'src/images/highscoresButtonSpriteSheet.png', 100, 50, 2);

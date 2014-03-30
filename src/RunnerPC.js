@@ -4,19 +4,19 @@
 
 /**
  * RunnerPC is an object intended to be the players character(PC)
- * @constructor
  * @param {number} posX - position of RunnerPC the x plane
  * @param {number} posY - position of RunnerPC on the y plane, positive is down
  * @param {number} scaleX - width scale of RunnerPC sprite
  * @param {number} scaleY - height scale of RunnerPC sprite
  * @param {number} gravity - amount of downward force applied to the RunnerPC
  * @param {number} drag - amount of opposing force applied to the RunnerPC whenever it moves
- * @param {string} playerSprite - string that's a key of an image loaded in via Phasers load.image function
- * @param {phaser game} game - phaser game object to allow access to game specific functions
+ * @param {string} sprite - string that's a key of an image loaded in via Phasers load.image function
+ * @param {game} game - phaser game object to allow access to game specific functions
+ * @constructor
  * */
- function RunnerPC(posX, posY, scaleX, scaleY, gravity, drag, playerSprite, game){
+ function RunnerPC(posX, posY, scaleX, scaleY, gravity, drag, sprite, game){
     this.game = game;
-    this.character = this.game.add.sprite(posX, posY, playerSprite);
+    this.character = this.game.add.sprite(posX, posY, sprite);
     this.character.scale.x = scaleX;
     this.character.scale.y = scaleY;
     this.character.anchor.set(0.5);
@@ -25,12 +25,16 @@
     this.character.body.velocity.x = 50;
     this.character.body.gravity.y = gravity;
     this.character.body.collideWorldBounds = true;
+    this.game.camera.follow(this.character, this.game.camera.FOLLOW_PLATFORMER);
+
 
     // inversion timer mostly just to create a lag before you can press
     // so it doesn't double activate and cancel itself out
     this.inversionTimer = 0;
     this.inversionCooldown = 500;
     this.score = 0;
+    this.onFloor = false;
+
     // relevant to create a cooldown interval between boost presses, this one is
     // a gameplay mechanic
     this.boostCooldownTimer = 0;
@@ -39,6 +43,18 @@
     this.boostActivationPeriod = 2000;
     this.boostActive = false;
 }
+
+/**
+ * function for changing the players position
+ * @public
+ * @function
+ * @param {number} posX - value to replace the current x position with
+ * @param {number} posY - value to replace the current y position with
+ */
+RunnerPC.prototype.updatePosition = function(posX, posY){
+   this.character.position.x = posX;
+   this.character.position.y = posY;
+};
 
 /**
  * returns this RunnerPC's score
@@ -69,12 +85,22 @@ RunnerPC.prototype.updateGravity = function(gravity){
 };
 
 /**
+ * @public
+ * @function
+ * @param {boolean} isOnFloor - simple boolean that changes the onFloor variable which
+ * dictates if a character is on the ground or not and thus able to invert the gravity
+ */
+RunnerPC.prototype.updateOnFloor = function(isOnFloor){
+    this.onFloor = isOnFloor;
+};
+
+/**
  * Function that inverts the gravity affecting the RunnerPC
  * @public
  * @function
  */
 RunnerPC.prototype.invertGravity = function(){
-    if(this.inversionTimer > this.inversionCooldown){
+    if(this.inversionTimer > this.inversionCooldown && this.onFloor == true){
         this.character.body.gravity.y = -this.character.body.gravity.y;
         this.inversionTimer = 0;
         this.character.scale.x *= -1; // flip the sprite (no phaser flip as far as I can find anyway)

@@ -22,7 +22,7 @@ GameState.Tutorial.prototype = {
      * @function
      */
     create: function () {
-        this.backButton = this.add.button(730, 550, 'backButtonSpriteSheet', this.enterMainMenu, this, 1, 0, 0, 0);
+        this.backButton = this.add.button(400, 550, 'backButtonSpriteSheet', this.enterMainMenu, this, 1, 0, 0, 0);
         this.backButton.anchor.setTo(0.5, 0.5); // changes the point where its positioned from the Anchor point
 
         this.tutorialImage = this.game.add.sprite(400, 300, 'tutorialDisplay');
