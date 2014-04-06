@@ -24,16 +24,18 @@ GameState.Init.prototype = {
     preload: function(){
         // you can actually just refer to game as this. while in a state,
         // however I wish to distinguish between them
-        this.game.load.image('player', 'src/images/blue_run_animation_001.png');
         this.game.load.image('boostButton', 'src/images/boostButton.png');
         this.game.load.image('invertGravityButton', 'src/images/invertGravityButton.png');
         this.game.load.image('tutorialDisplay', 'src/images/tutorial.png');
         this.game.load.image('platform', 'src/images/platform.png');
         this.game.load.image('platformMetal', 'src/images/platformMetal.png');
+        this.game.load.image('background', 'src/images/Background.jpg');
+        this.game.load.image('spikes', 'src/images/spikes.png');
         this.game.load.spritesheet('playButtonSpriteSheet', 'src/images/playButtonSpriteSheet.png', 100, 50, 2);
         this.game.load.spritesheet('tutorialButtonSpriteSheet', 'src/images/tutorialButtonSpriteSheet.png', 100, 50, 2);
         this.game.load.spritesheet('highscoresButtonSpriteSheet', 'src/images/highscoresButtonSpriteSheet.png', 100, 50, 2);
         this.game.load.spritesheet('backButtonSpriteSheet','src/images/backButtonSpriteSheet.png', 100, 50, 2);
+        this.game.load.spritesheet('character', 'src/images/bluesprite.png', 35, 60, 24);
  },
 
     /** Initialization function for the Init state used to setup the games window and variables

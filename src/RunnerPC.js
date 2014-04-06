@@ -14,16 +14,18 @@
  * @param {game} game - phaser game object to allow access to game specific functions
  * @constructor
  * */
- function RunnerPC(posX, posY, scaleX, scaleY, gravity, drag, sprite, game){
+ function RunnerPC(posX, posY, scaleX, scaleY, gravity, animatedSprite, spriteFps, game){
     this.game = game;
-    this.character = this.game.add.sprite(posX, posY, sprite);
+    this.character = this.game.add.sprite(posX, posY, animatedSprite);
+    this.character.animations.add('run');
+    this.character.animations.play('run', spriteFps, true);
     this.character.scale.x = scaleX;
     this.character.scale.y = scaleY;
     this.character.anchor.set(0.5);
     this.game.physics.enable(this.character, Phaser.Physics.ARCADE);
-    this.character.body.drag.set(drag);
-    this.character.body.velocity.x = 50;
+    this.velocityX = 50;
     this.character.body.gravity.y = gravity;
+
     this.character.body.collideWorldBounds = true;
     this.game.camera.follow(this.character, this.game.camera.FOLLOW_PLATFORMER);
 
@@ -124,12 +126,11 @@ RunnerPC.prototype.boost = function(){
  * function for changing the players velocity
  * @public
  * @function
- * @param {number} velocityX - value to replace the current x velocity with
- * @param {number} velocityY - value to replace the current y velocity with
+ * @param {number} vX - value to replace the current x velocity with
+ * @param {number} vY - value to replace the current y velocity with
  */
-RunnerPC.prototype.updateVelocity = function(velocityX, velocityY){
-  this.character.body.velocity.x = velocityX;
-  this.character.body.velocity.y = velocityY;
+RunnerPC.prototype.updateVelocity = function(vX, vY){
+  this.velocityX = vX;
 };
 
 /**
@@ -139,7 +140,7 @@ RunnerPC.prototype.updateVelocity = function(velocityX, velocityY){
  * @returns {b.Physics.Arcade.Body.velocity.x|*}
  */
 RunnerPC.prototype.getVelocityX = function(){
-    return this.character.body.getVelocityX();
+    return this.velocityX;
 };
 
 /**
@@ -195,7 +196,12 @@ RunnerPC.prototype.update = function(){
     this.inversionTimer += elapsedTime;
 
     // calculating the distance travelled by the character using velocity and acceleration and using it as the score
-    this.score += this.character.body.velocity.x * (1/1000 * elapsedTime) + 1/2 * this.character.body.acceleration.x * ((1/1000 * elapsedTime) * (1/1000 * elapsedTime));
+    this.score += this.velocityX * (1/1000 * elapsedTime) + 1/2 * this.character.body.acceleration.x * ((1/1000 * elapsedTime) * (1/1000 * elapsedTime));
+
+    if(this.onFloor == true)
+        this.character.body.velocity.x = this.velocityX;
+    else
+        this.character.body.velocity.x = 0;
 
     if(this.boostActive == false)
         this.boostCooldownTimer += elapsedTime;
@@ -203,12 +209,12 @@ RunnerPC.prototype.update = function(){
         this.boostActivationTimer += elapsedTime;
 
     if(this.boostActive == true && this.boostActivationTimer < this.boostActivationPeriod){
-        this.character.body.velocity.x = 300;
-        this.character.body.velocity.y = 0;
+        this.velocityX = 500;
+     //   this.character.body.velocity.y = 0;
     }else{
         this.boostActive = false;
         this.boostActivationTimer = 0;
-        this.character.body.velocity.x = 50;
+        this.velocityX = 50;
     }
 
 };

@@ -18,7 +18,7 @@
  * @param {Group} group - link to a phaser group object to allow all the WorldObject objects to be added to a group
  * that allows for easy collision checking etc.!
  * */
-function WorldObject(posX, posY, scaleX, scaleY, sprite, game, group){
+function WorldObject(posX, posY, scaleX, scaleY, sprite, game, group, leftCollideable){
     this.game = game;
     this.platform = group.create(posX, posY, sprite);
     this.platform.scale.x = scaleX;
@@ -26,5 +26,6 @@ function WorldObject(posX, posY, scaleX, scaleY, sprite, game, group){
     this.platform.anchor.set(0.5);
     this.game.physics.enable(this.platform, Phaser.Physics.ARCADE);
     this.platform.body.immovable = true;
+    this.platform.body.checkCollision.left = leftCollideable;
     this.platform.body.collideWorldBounds = false;
 }
