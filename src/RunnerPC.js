@@ -8,19 +8,21 @@
  * @param {number} posY - position of RunnerPC on the y plane, positive is down
  * @param {number} scaleX - width scale of RunnerPC sprite
  * @param {number} scaleY - height scale of RunnerPC sprite
+ * @param {number} rot - rotation of RunnerPC
  * @param {number} gravity - amount of downward force applied to the RunnerPC
  * @param {number} drag - amount of opposing force applied to the RunnerPC whenever it moves
  * @param {string} sprite - string that's a key of an image loaded in via Phasers load.image function
  * @param {game} game - phaser game object to allow access to game specific functions
  * @constructor
  * */
- function RunnerPC(posX, posY, scaleX, scaleY, gravity, animatedSprite, spriteFps, game){
+ function RunnerPC(posX, posY, scaleX, scaleY, rot, gravity, animatedSprite, spriteFps, game){
     this.game = game;
     this.character = this.game.add.sprite(posX, posY, animatedSprite);
     this.character.animations.add('run');
     this.character.animations.play('run', spriteFps, true);
     this.character.scale.x = scaleX;
     this.character.scale.y = scaleY;
+    this.character.angle = rot;
     this.character.anchor.set(0.5);
     this.game.physics.enable(this.character, Phaser.Physics.ARCADE);
     this.velocityX = 50;
@@ -123,13 +125,30 @@ RunnerPC.prototype.boost = function(){
 };
 
 /**
+ * Function that reset all the players variables to default
+ * @public
+ * @function
+ */
+RunnerPC.prototype.reset = function(){
+    this.boostActive = false;
+    this.character.body.gravity.y = 50;
+    this.character.body.velocity.y = 0;
+    this.character.angle = 0;
+    this.score = 0;
+    this.velocityX = 50;
+    this.character.scale.x = 1;
+    this.boostActivationTimer = 0;
+    this.inversionTimer = 0;
+    this.character.position.y = 434;
+}
+
+/**
  * function for changing the players velocity
  * @public
  * @function
  * @param {number} vX - value to replace the current x velocity with
- * @param {number} vY - value to replace the current y velocity with
  */
-RunnerPC.prototype.updateVelocity = function(vX, vY){
+RunnerPC.prototype.updateVelocityX = function(vX){
   this.velocityX = vX;
 };
 
@@ -210,7 +229,6 @@ RunnerPC.prototype.update = function(){
 
     if(this.boostActive == true && this.boostActivationTimer < this.boostActivationPeriod){
         this.velocityX = 500;
-     //   this.character.body.velocity.y = 0;
     }else{
         this.boostActive = false;
         this.boostActivationTimer = 0;

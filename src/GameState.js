@@ -10,6 +10,10 @@
  * particles, physics, rnd
  * @constructor */
 var GameState = {
-
+    platformPositions: null,
+    obstaclePositions: null,
+    backgroundScrollX: null,
+    playerPosition: null,
+    floorAndRoofPositions: null
 
 };

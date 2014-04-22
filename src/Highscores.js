@@ -1,27 +1,25 @@
 /**
- * Created by ANDREW on 23/03/14.
+ * Created by ANDREW on 22/04/14.
  */
-/**
- * Created by ANDREW on 21/03/14.
- */
-
-/** Creates the Tutorial Object, which is essentially used as a state class within Phaser
- * It's job is to display the Tutorial Screen.
+/** Creates the Highscores Object, which is essentially used as a state class within Phaser
+ * It's job is to display the Highscore Screen that displays all the highscores.
  *@constructor
  *@param {Object} game a link to an instantiated Phaser Game Object */
-GameState.Tutorial = function (game) {
+GameState.Highscores = function (game) {
 
 };
 
-GameState.Tutorial.prototype = {
+GameState.Highscores.prototype = {
 
     /**
-     * Initializes all things required for the tutorial, Phaser takes care of it's own
+     * Initializes all things required for the Highscores screen and table, Phaser takes care of it's own
      * renders and Phaser specific object updates.
+     *
      * @private
      * @function
      */
     create: function () {
+
         this.background = this.game.add.tileSprite(0,0, this.game.world.width, this.game.world.height,'background');
         this.background.tilePosition.x = GameState.backgroundScrollX;
 
@@ -47,11 +45,16 @@ GameState.Tutorial.prototype = {
         this.player.updateVelocityX(0);
         this.player.updateGravity(0);
 
-        this.backButton = this.add.button(400, 550, 'backButtonSpriteSheet', this.enterMainMenu, this, 1, 0, 0, 0);
+        this.highscoreBackground = this.game.add.tileSprite(game.world.width/2, game.world.height/2 - 75, 300, 400, 'blankBackground');
+        this.highscoreBackground.anchor.set(0.5, 0.5);
+
+        this.highscoreTitleText = game.add.text((game.world.width / 2), (game.world.height / 2) - 260, 'Highscore', { font: '24px Impact', fill: '#aaa' });
+        this.highscoreTitleText.anchor.set(0.5, 0.5);
+
+        this.backButton = this.add.button(400, 475, 'backButtonSpriteSheet', this.enterMainMenu, this, 1, 0, 0, 0);
         this.backButton.anchor.setTo(0.5, 0.5); // changes the point where its positioned from the Anchor point
 
-        this.tutorialImage = this.game.add.sprite(400, 300, 'tutorialDisplay');
-        this.tutorialImage.anchor.set(0.5, 0.5);
+        this.highscoreTable = new HighscoreTable(game);
     },
 
     /**
@@ -62,4 +65,4 @@ GameState.Tutorial.prototype = {
     enterMainMenu: function() {
         this.game.state.start('Menu');
     }
-};
+}
