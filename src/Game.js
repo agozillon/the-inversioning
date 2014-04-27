@@ -180,20 +180,24 @@ GameState.Game.prototype = {
                this.player.updateVelocityX(0);
                this.player.character.body.velocity.x = 0;
                this.player.character.body.velocity.y = 0;
-               this.gameOverState.switch(this.game, this.gameOverState.getGoodGameOverScreen(), this);
+
+               if(GameState.highscoreTable.isItAHighscore(this.player.getScore()))
+                    this.gameOverState.switch(this.game, this.gameOverState.getGoodGameOverScreen(), this);
+               else
+                    this.gameOverState.switch(this.game, this.gameOverState.getBadGameOverScreen(), this);
 
                for(var i = 0; i < this.floorAndRoof.length; i++){
-                     var current = this.floorAndRoof.getAt(i);
-                     current.body.velocity.x = 0;
+                    var current = this.floorAndRoof.getAt(i);
+                    current.body.velocity.x = 0;
                }
                for(var i = 0; i < this.randomPlatforms.length; i++){
-                     var current = this.randomPlatforms.getAt(i);
-                     current.body.velocity.x = 0;
+                    var current = this.randomPlatforms.getAt(i);
+                    current.body.velocity.x = 0;
                 }
 
                for(var i = 0; i < this.obstacles.length; i++){
-                     var current = this.obstacles.getAt(i);
-                     current.body.velocity.x = 0;
+                    var current = this.obstacles.getAt(i);
+                    current.body.velocity.x = 0;
                }
 
                this.gameStop = true;

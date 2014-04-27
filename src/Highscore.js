@@ -142,6 +142,26 @@ Highscore.prototype.getHighscore = function(){
 };
 
 /**
+ * function that returns the name of the highscorer
+ * @returns {string} this is the name parameter of the current Highscore object
+ * @function
+ * @public
+ */
+Highscore.prototype.getName = function(){
+    return this.name;
+};
+
+/**
+ * function that returns the score of the highscorer
+ * @returns {number} this is the score parameter of the current Highscore object
+ * @function
+ * @public
+ */
+Highscore.prototype.getScore = function(){
+    return this.score;
+};
+
+/**
  * update function for the highscore it updates the internal timer for
  * increments/decrements, replaces/renews the string (Javascript has no index access
  * as Strings are immutable) and updates the Phaser Text object to render the new string

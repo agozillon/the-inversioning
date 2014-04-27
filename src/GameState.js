@@ -14,6 +14,6 @@ var GameState = {
     obstaclePositions: null,
     backgroundScrollX: null,
     playerPosition: null,
-    floorAndRoofPositions: null
-
+    floorAndRoofPositions: null,
+    highscoreTable: null
 };

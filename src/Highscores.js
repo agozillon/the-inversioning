@@ -54,7 +54,8 @@ GameState.Highscores.prototype = {
         this.backButton = this.add.button(400, 475, 'backButtonSpriteSheet', this.enterMainMenu, this, 1, 0, 0, 0);
         this.backButton.anchor.setTo(0.5, 0.5); // changes the point where its positioned from the Anchor point
 
-        this.highscoreTable = new HighscoreTable(game);
+        GameState.highscoreTable.createText();
+
     },
 
     /**

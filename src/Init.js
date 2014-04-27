@@ -140,6 +140,9 @@ GameState.Init.prototype = {
         GameState.playerPosition[2] = 1;   // scale
         GameState.playerPosition[3] = 0;   // rotation
 
+        GameState.highscoreTable = new HighscoreTable(game);
+        GameState.highscoreTable.getHighscoreTable();
+
          // the relevant windows created and all preloads have started, switch to menu
         this.game.state.start('Menu');
     }

@@ -5,20 +5,11 @@
  *@constructor
  *@param {Object} game a link to an instantiated Phaser Game Object */
 function HighscoreTable(game){
-
-    //this.highscoreText = this.game.add.text(posX, posY, "Enter Your Name:\n" + " " + this.name, { font: '24px Impact', fill: '#f00' });
-    //this.highscoreText.anchor.set(0.5, 0.5);
-    this.scores = [100, 90, 80, 70, 60, '', '', '', '', ''];
-    this.names = ['Andrew','Steve', 'Martin', 'Ryan', 'Liam', '', '', '', '', ''];
+    this.scores = ['', '', '', '', '', '', '', '', '', ''];
+    this.names = ['','', '', '', '', '', '', '', '', ''];
     this.highscoreListText = new Array();
     this.game = game;
-
-    for(var i = 0; i < 10; i++){
-
-        this.highscoreListText[i] = this.game.add.text(this.game.world.width / 2 - 150, 100 + (i*35), (i+1) + ".  " + this.names[i] + " " + this.scores[i], { font: '24px Impact', fill: '#f00' } );
-        this.highscoreListText[i].anchor.set(0.0, 0.5);
-    }
-
+    this.createText();
 };
 
 /**
@@ -34,8 +25,75 @@ HighscoreTable.prototype.add = function(name, score, arrayPosition){
 
     this.scores[arrayPosition] = score;
     this.names[arrayPosition] = name;
-    this.highscoreListText[arrayPosition].text = (arrayPosition+1) + ".  " + this.names[arrayPosition] + " " + this.scores[arrayPosition];
+
+    // bubble sort into order
+    for(var i = 1; i < this.scores.length; i++)
+        for(var i2 = 0; i2 < this.scores.length-1; i2++){
+            if(this.scores[i] >= this.scores[i2]){
+                var tmp = this.names[i2];
+                this.names[i2] = this.names[i];
+                this.names[i] = tmp;
+
+                tmp = this.scores[i2];
+                this.scores[i2] = this.scores[i];
+                this.scores[i] = tmp;
+            }
+        }
+
+    for(i = 0; i < this.highscoreListText.length; i++)
+        if(this.scores[i])
+            this.postHighscore(i);
 };
+
+/**
+ * getHighscoreTable function it pulls all of the highscore data from the google app engine server
+ * There can be up to 10 unique values stored at a time (1 for each position)
+ * @public
+ * @function
+ */
+HighscoreTable.prototype.getHighscoreTable = function(){
+    "use strict";
+
+    var tmpSelfRef = this; // temp reference to highscore so we can access it within
+    // basic Ajax server call to the google app server, it should be up at all times if you have
+    // any problems please contact b00234203@studentmail.uws.ac.uk
+    $.ajax({
+        type: "GET",
+        url: "http://aghighscore.appspot.com", // "http://localhost:9080"
+        async: true,
+        contentType: "application/json",
+        dataType: "jsonp",
+        success: function(resp){
+            var i, tmpPos;
+            for(i = 0; i < resp.length; i++){
+                tmpPos = parseInt(resp[i].position, 10);
+                tmpSelfRef.scores[tmpPos] = parseInt(resp[i].score, 10);
+                tmpSelfRef.names[tmpPos] = resp[i].playerName;
+            }
+        }
+    });
+};
+
+/**
+ * Simple function that uses Ajax to send a highscore value to the Google app engine server
+ * @param {number} pos - number that defines the position of the highscore in the table it'll be used as a unique key by the server
+ * replacing any previous highscore with that key
+ * @public
+ * @function
+ */
+HighscoreTable.prototype.postHighscore = function(pos){
+    "use strict";
+
+    // name key - position in the highscore table, score - player score, player name - player name
+    var url = "http://aghighscore.appspot.com" + "/loc?name=" + pos + "&score=" + this.scores[pos] + "&playerName=" + this.names[pos];
+    $.ajax({
+        type: "GET",
+        url: url,
+        async: true,
+        contentType: "application/json",
+        dataType: "jsonp"
+    })
+}
 
 /**
  * function that returns true if the score is a highscore or false if its not a highscore on the table
@@ -56,4 +114,19 @@ HighscoreTable.prototype.isItAHighscore = function(score){
     // if none of the above are true then the score is not a highscore, this is assuming
     // the list is sorted in descending order
     return false;
+};
+
+/**
+ * createText is a function that creates all of the Highscore text as Phaser text objects capable of being rendered to screen
+ * it also positions them appropriately on the screen for them to be positioned as a highscore table, all phaser objects get deleted
+ * on state switch
+ * @public
+ * @function
+ */
+HighscoreTable.prototype.createText = function(){
+    for(var i = 0; i < 10; i++){
+
+        this.highscoreListText[i] = this.game.add.text(this.game.world.width / 2 - 150, 100 + (i*35), (i+1) + ".  " + this.names[i] + " " + this.scores[i], { font: '24px Impact', fill: '#f00' } );
+        this.highscoreListText[i].anchor.set(0.0, 0.5);
+    }
 };

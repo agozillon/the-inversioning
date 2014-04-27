@@ -19,16 +19,21 @@ GameOverScoreState.prototype.create = function(game, gameOverControl, playGameSt
     this.scoreDisplayText = game.add.text((game.world.width / 2), (game.world.height / 2) - 20, 'Score: ' + playGameState.player.getScore(), { font: '24px Impact', fill: '#f00' });
     this.scoreDisplayText.anchor.set(0.5, 0.5);
 
+    this.highscore = new Highscore(game, (game.world.width / 2), (game.world.height / 2) + 40);
+    this.highscore.updateVisibility(true);
+    this.highscore.updateScore(playGameState.player.getScore());
+
+    // the only rather hacky javascript way of getting around nested function "this" issues
+    var temp = this;
+
     this.doneButton = game.add.sprite((game.world.width / 2), (game.world.height / 2) + 100,'doneButton');
     this.doneButton.inputEnabled = true;
-    this.doneButton.events.onInputDown.add(function(){playGameState.setPositions(), game.state.start('Menu')}, game);
+    this.doneButton.events.onInputDown.add(function(){GameState.highscoreTable.add(temp.highscore.getName(), temp.highscore.getScore(), 9), playGameState.setPositions(), game.state.start('Menu')}, game);
     this.doneButton.anchor.setTo(0.5, 0.5); // changes the point where its positioned from the Anchor point
     this.doneButton.scale.x = 0.75;
     this.doneButton.scale.y = 0.5;
 
-    this.highscore = new Highscore(game, (game.world.width / 2), (game.world.height / 2) + 40);
-    this.highscore.updateVisibility(true);
-    this.highscore.updateScore(playGameState.player.getScore());
+
 }
 
 GameOverScoreState.prototype.exit = function(){
