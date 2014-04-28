@@ -15,5 +15,6 @@ var GameState = {
     backgroundScrollX: null,
     playerPosition: null,
     floorAndRoofPositions: null,
+    wallPositions: null,
     highscoreTable: null
 };

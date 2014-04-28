@@ -44,10 +44,12 @@ GameState.MainMenu.prototype = {
         for(i = 0; i < GameState.floorAndRoofPositions.length; i++)
             new WorldObject(GameState.floorAndRoofPositions[i][0], GameState.floorAndRoofPositions[i][1], 1.0, 1.0, 0,'platform', this.game, this.floorAndRoof, true);
 
+        this.randomWalls = this.game.add.group();
+        for(i = 0; i < GameState.wallPositions.length; i++)
+            new WorldObject(GameState.wallPositions[i][0], GameState.wallPositions[i][1], 1.0, 1.0, 0, 'wall', this.game, this.randomWalls, false);
 
         this.player = new RunnerPC(GameState.playerPosition[0], GameState.playerPosition[1], GameState.playerPosition[2], 1.0, GameState.playerPosition[3], 50.0,'character', 48, game);
-        this.player.updateVelocityX(0);
-        this.player.updateGravity(0);
+
 
         // menu buttons
         this.playButton = this.add.button(this.game.world.centerX - 60, this.game.world.centerY, 'playButtonSpriteSheet', this.enterPlayState, this, 1, 0, 0, 0);

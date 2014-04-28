@@ -34,9 +34,10 @@ GameState.Init.prototype = {
         this.game.load.image('spikes', 'src/images/spikes.png');
         this.game.load.image('blankBackground', 'src/images/blankBackground.png');
         this.game.load.image('enterScoreButton', 'src/images/enterHighscore.png');
-        this.game.load.image('backToMenuButton', 'src/images/backToMenu.png')
+        this.game.load.image('backToMenuButton', 'src/images/backToMenu.png');
         this.game.load.image('doneButton', 'src/images/doneButton.png');
-        this.game.load.image('replayButton', 'src/images/replay.png')
+        this.game.load.image('replayButton', 'src/images/replay.png');
+        this.game.load.image('wall', 'src/images/wall.png');
         this.game.load.spritesheet('playButtonSpriteSheet', 'src/images/playButtonSpriteSheet.png', 100, 50, 2);
         this.game.load.spritesheet('tutorialButtonSpriteSheet', 'src/images/tutorialButtonSpriteSheet.png', 100, 50, 2);
         this.game.load.spritesheet('highscoresButtonSpriteSheet', 'src/images/highscoresButtonSpriteSheet.png', 100, 50, 2);
@@ -120,6 +121,17 @@ GameState.Init.prototype = {
             GameState.platformPositions[i][1] = this.game.rnd.integerInRange(100, 440);
         }
 
+        GameState.wallPositions = new Array();
+        for(i = 0; i < 4; i++){
+            GameState.wallPositions[i] = new Array();
+            GameState.wallPositions[i][0] = 600;
+
+            if(i%2 == 0)
+                GameState.wallPositions[i][1] = 384;
+            else
+                GameState.wallPositions[i][1] = 96;
+        }
+
         // positions for the floor and roof bricks based on there center point
         GameState.floorAndRoofPositions = new Array();
         currentArrayPos = 0;
@@ -131,6 +143,9 @@ GameState.Init.prototype = {
                 GameState.floorAndRoofPositions[currentArrayPos][1] = i2 * 480;
                 currentArrayPos++;
             }
+
+
+
 
         GameState.backgroundScrollX = 0;
 

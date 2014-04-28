@@ -33,15 +33,15 @@ GameState.Game.prototype = {
         // between states
         this.obstacles = this.game.add.group();
         for(i = 0; i < GameState.obstaclePosAndRot.length; i++)
-        {
             new WorldObject(GameState.obstaclePosAndRot[i][0], GameState.obstaclePosAndRot[i][1], 1.0, 1.0, GameState.obstaclePosAndRot[i][2], 'spikes', this.game, this.obstacles, true);
-        }
 
         this.randomPlatforms = this.game.add.group();
         for(i = 0; i < GameState.platformPositions.length; i++)
-        {
             new WorldObject(GameState.platformPositions[i][0], GameState.platformPositions[i][1], 1.0, 1.0, 0, 'platformMetal', this.game, this.randomPlatforms, false);
-        }
+
+        this.randomWalls = this.game.add.group();
+        for(i = 0; i < GameState.wallPositions.length; i++)
+            new WorldObject(GameState.wallPositions[i][0], GameState.wallPositions[i][1], 1.0, 1.0, 0, 'wall', this.game, this.randomWalls, false);
 
         this.floorAndRoof = this.game.add.group();
         for(i = 0; i < GameState.floorAndRoofPositions.length; i++)
@@ -157,30 +157,25 @@ GameState.Game.prototype = {
                current.body.velocity.x = -this.player.getVelocityX();
            }
 
-            if(this.game.physics.arcade.collide(this.player.character, this.floorAndRoof)
-            || this.game.physics.arcade.collide(this.player.character, this.randomPlatforms))
-                this.player.updateOnFloor(true);
-            else
-                this.player.updateOnFloor(false);
+           if(this.game.physics.arcade.collide(this.player.character, this.floorAndRoof, this.player.separate, null, this.player)
+           || this.game.physics.arcade.collide(this.player.character, this.randomPlatforms, this.player.separate, null, this.player))
+               this.player.updateOnFloor(true);
+           else
+               this.player.updateOnFloor(false);
 
-           if(this.game.physics.arcade.collide(this.player.character, this.obstacles) && this.resetTimer > 100)
+          if(this.game.physics.arcade.collide(this.player.character, this.obstacles) && this.resetTimer > 100)
                 this.gameOver = true;
 
-           if(this.resetTimer < 100)
+
+          if(this.resetTimer < 100)
                 this.resetTimer += this.game.time.elapsed;
 
-           this.scoreText.text = 'Score ' + this.player.getScore();
+          this.scoreText.text = 'Score ' + this.player.getScore();
         }
         else
        {
            if(this.gameStop == false)
            {
-               // freeze everything
-               this.player.updateGravity(0);
-               this.player.updateVelocityX(0);
-               this.player.character.body.velocity.x = 0;
-               this.player.character.body.velocity.y = 0;
-
                if(GameState.highscoreTable.isItAHighscore(this.player.getScore()))
                     this.gameOverState.switch(this.game, this.gameOverState.getGoodGameOverScreen(), this);
                else
