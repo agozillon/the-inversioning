@@ -31,7 +31,9 @@
     this.game.physics.enable(this.character, Phaser.Physics.ARCADE);
     this.character.body.moves = false;
     this.character.body.collideWorldBounds = true;
-    this.velocityX = 50;
+    this.boostVelocityX = 500;
+    this.runVelocityX = 100;
+    this.velocityX = this.runVelocityX;
     this.velocityY = 10;
     this.game.camera.follow(this.character, this.game.camera.FOLLOW_PLATFORMER);
 
@@ -80,16 +82,6 @@ RunnerPC.prototype.getScore = function(){
  * */
 RunnerPC.prototype.updateScore = function(score){
       this.score = score;
-};
-
-/**
- * @public
- * @function
- * @param {number} gravity - a number dictating the amount of gravity you wish to replace the
- * current gravity with
- */
-RunnerPC.prototype.updateGravity = function(gravity){
-    this.character.body.gravity.y = gravity;
 };
 
 /**
@@ -158,10 +150,11 @@ RunnerPC.prototype.reset = function(){
     this.boostActive = false;
     this.character.angle = 0;
     this.score = 0;
-    this.velocityX = 50;
+    this.velocityX = this.runVelocityX;
     this.character.scale.x = 1;
     this.boostActivationTimer = 0;
     this.inversionTimer = 0;
+    this.velocityY = 10;
     this.character.position.y = 434;
 }
 
@@ -186,48 +179,6 @@ RunnerPC.prototype.getVelocityX = function(){
 };
 
 /**
- * returns velocity y
- * @public
- * @function
- * @returns {b.Physics.Arcade.Body.velocity.y|*}
- */
-RunnerPC.prototype.getVelocityY = function(){
-    return this.character.body.getVelocityY();
-};
-
-/**
- * basic function for changing the players acceleration
- * @public
- * @function
- * @param {number} accelerationX - value to replace the current x acceleration with
- * @param {number} accelerationY - value to replace the current y acceleration with
- */
-RunnerPC.prototype.updateAcceleration = function(accelerationX, accelerationY){
-    this.character.body.acceleration.x = accelerationX;
-    this.character.body.acceleration.y = accelerationY;
-};
-
-/**
- * returns acceleration x
- * @public
- * @function
- * @returns {b.Physics.Arcade.Body.acceleration.x|*}
- */
-RunnerPC.prototype.getAccelerationX = function(){
-    return this.character.body.getAccelerationX()
-};
-
-/**
- * returns acceleration y
- * @public
- * @function
- * @returns {b.Physics.Arcade.Body.acceleration.y|*}
- */
-RunnerPC.prototype.getAccelerationY = function(){
-    return this.character.body.getAccelerationY();
-};
-
-/**
  * update function that keeps track of relevant timing for the RunnerPC
  * and various other update logic for the RunnerPC to function
  * @public
@@ -244,10 +195,6 @@ RunnerPC.prototype.update = function(){
     // calculating the distance travelled by the character using velocity and acceleration and using it as the score
     this.score += this.velocityX * (1/1000 * elapsedTime);
 
-    if(this.onFloor == true)
-       this.character.body.velocity.x = this.velocityX;
-    else
-        this.character.body.velocity.x = 0;
 
     if(this.boostActive == false)
         this.boostCooldownTimer += elapsedTime;
@@ -255,11 +202,11 @@ RunnerPC.prototype.update = function(){
         this.boostActivationTimer += elapsedTime;
 
     if(this.boostActive == true && this.boostActivationTimer < this.boostActivationPeriod){
-        this.velocityX = 500;
+        this.velocityX = this.boostVelocityX;
     }else{
         this.boostActive = false;
         this.boostActivationTimer = 0;
-        this.velocityX = 50;
+        this.velocityX = this.runVelocityX;
     }
 
 };

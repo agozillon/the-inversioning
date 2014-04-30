@@ -13,6 +13,9 @@ GameState.Game = function (game) {
     this.gameOver = false;
     this.gameStop = false;
     this.resetTimer = 110;
+    this.obstaclesIterator = 0;
+    this.wallIterator = 2;
+    this.platformIterator = 0;
 };
 
 
@@ -41,7 +44,7 @@ GameState.Game.prototype = {
 
         this.randomWalls = this.game.add.group();
         for(i = 0; i < GameState.wallPositions.length; i++)
-            new WorldObject(GameState.wallPositions[i][0], GameState.wallPositions[i][1], 1.0, 1.0, 0, 'wall', this.game, this.randomWalls, false);
+            new WorldObject(GameState.wallPositions[i][0], GameState.wallPositions[i][1], 1.0, 1.0, 0, 'wall', this.game, this.randomWalls, true);
 
         this.floorAndRoof = this.game.add.group();
         for(i = 0; i < GameState.floorAndRoofPositions.length; i++)
@@ -87,23 +90,24 @@ GameState.Game.prototype = {
            {
                var current = this.obstacles.getAt(i);
 
-               if(i != 0)
-                   var previous = this.obstacles.getAt(i-1);
-               else
-                   var previous = this.obstacles.getAt(this.obstacles.length - 1);
-
-
                if(current.position.x <= -80)
                {
                    var ranMax, ranMin;
-                   ranMin = previous.position.x + 400;
-                   ranMax = previous.position.x + 800;
+                   ranMin = this.randomWalls.getAt(this.wallIterator).position.x + 32 + Math.floor(this.obstaclesIterator / 2) * 200;
+                   ranMax = ranMin + 136;
+
+                   this.obstaclesIterator++;
+
+                   if(this.obstaclesIterator >= 8)
+                      this.obstaclesIterator = 0;
 
                    current.position.x = game.rnd.integerInRange(ranMin, ranMax);
+
                }
 
                current.body.velocity.x = -this.player.getVelocityX();
            }
+
 
            // loops through the platforms positions them if they go off screen and sets
            // there velocity to the inverse of the players (we're not moving the player
@@ -113,31 +117,65 @@ GameState.Game.prototype = {
            {
                var current = this.randomPlatforms.getAt(i);
 
-               if(i != 0)
-                    var previous = this.randomPlatforms.getAt(i-1);
-               else
-                    var previous = this.randomPlatforms.getAt(this.randomPlatforms.length - 1);
-
-
                if(current.position.x <= -80)
                {
                    var ranMax, ranMin;
-                   ranMin = previous.position.x + 400;
-                   ranMax = previous.position.x + 800;
+                   ranMin = this.randomWalls.getAt(this.wallIterator).position.x  + 80 + (this.platformIterator * 266.67);
+                   ranMax = ranMin + 128;
+
+                   this.platformIterator++;
+
+                   if(this.platformIterator >= 3)
+                       this.platformIterator = 0;
 
                    current.position.x = game.rnd.integerInRange(ranMin, ranMax);
-                   current.position.y = game.rnd.integerInRange(100, 440);
+                   current.position.y = game.rnd.integerInRange(100, 400);
                }
 
                current.body.velocity.x = -this.player.getVelocityX();
            }
 
+           for(var i = 0; i < this.randomWalls.length-1; i++)
+           {
+               var current = this.randomWalls.getAt(i);
+               var lastWall = this.randomWalls.getAt(3);
+
+               if(current.position.x <= -80)
+               {
+                   current.position.x = 2400; // furthest away point on the x where the walls can spawn
+
+                   this.wallIterator = i;
+
+                   // choose the walls side based on the outcome of the randomizer
+                   if(game.rnd.integerInRange(1, 1000) % 2 == 0){
+                       current.position.y = 80;
+                   }else{
+                       current.position.y = 400;
+                   }
+
+                   // check if the 4th wall is off the screen if it is randomly check if we wish
+                   // to place the 4th wall alongside the current wall to make a double sided blockade
+                   // of walls
+                   if(lastWall.position.x <= -80 && game.rnd.integerInRange(1, 1000) % 2 == 0){
+                       lastWall.position.x = current.position.x;
+
+                       if(current.position.y == 80){
+                           lastWall.position.y = 400;
+                       }else{
+                           lastWall.position.y = 80;
+                       }
+                   }
+               }
+
+               current.body.velocity.x = -this.player.getVelocityX();
+               lastWall.body.velocity.x = -this.player.getVelocityX();
+           }
 
 
            // loops through the floor and roof tiles and positions them one after the other as
            // they drop off of the left hand side of the screen, just adding them onto the end
            // of the screen width sadly makes the tiles positioning gradually break apart as we boost
-           // hence the slightly more complex positioning after hte previous tile
+           // hence the slightly more complex positioning after the previous tile
            for(var i = 0; i < this.floorAndRoof.length; i++)
            {
                var current = this.floorAndRoof.getAt(i);
@@ -163,9 +201,8 @@ GameState.Game.prototype = {
            else
                this.player.updateOnFloor(false);
 
-          if(this.game.physics.arcade.collide(this.player.character, this.obstacles) && this.resetTimer > 100)
-                this.gameOver = true;
-
+           if(this.game.physics.arcade.collide(this.player.character, this.randomWalls) || this.game.physics.arcade.collide(this.player.character, this.obstacles) && this.resetTimer > 100)
+               this.gameOver = true;
 
           if(this.resetTimer < 100)
                 this.resetTimer += this.game.time.elapsed;
@@ -195,6 +232,11 @@ GameState.Game.prototype = {
                     current.body.velocity.x = 0;
                }
 
+               for(var i = 0; i < this.randomWalls.length; i++){
+                   var current = this.randomWalls.getAt(i);
+                   current.body.velocity.x = 0;
+               }
+
                this.gameStop = true;
            }
 
@@ -214,11 +256,11 @@ GameState.Game.prototype = {
             var current = this.obstacles.getAt(i);
 
             var ranMax, ranMin;
-            ranMin = 800 + (rowCounter * 400);
-            ranMax = 800 + (rowCounter * 400) + 400;
+            ranMin = 832 + (rowCounter * 200);
+            ranMax = ranMin + 136;
 
             rowCounter++;
-            if(rowCounter > (this.randomPlatforms.length / 2)-1)
+            if(rowCounter > (this.obstacles.length / 2)-1)
                 rowCounter = 0;
 
             current.position.x = game.rnd.integerInRange(ranMin, ranMax);
@@ -226,23 +268,56 @@ GameState.Game.prototype = {
             current.body.velocity.x = -this.player.getVelocityX();
         }
 
-
         for(i = 0; i < this.randomPlatforms.length; i++)
         {
-            var current = this.randomPlatforms.getAt(i);
+            current = this.randomPlatforms.getAt(i);
 
-            var ranMax, ranMin;
-            ranMin = 800 + (i * 400);
-            ranMax = 800 + (i * 400) + 400;
+            ranMax, ranMin;
+            ranMin = 880 + (i * 266.67); // distance till next wall 800 / 3 platform count between walls = 266.67 pixels
+            // 128 * 2(total number of spaces required to space out platforms, 1 64 set per platform 3 linked together = 256)
+            // (space with - 160 taken from the start and end relating to 16 pixels from half the wall and 64 from the platforms * 2 for each wall
+            // so 800 - 160 = 640) 640 - 256 = 384 the space left to randomize the objects in. And now we divide it by the number of platforms to get
+            // 128! The space for each platform to randomize itself in.
+            ranMax = ranMin + 128;
 
             current.position.x = game.rnd.integerInRange(ranMin, ranMax);
-            current.position.y = game.rnd.integerInRange(100, 440);
+            current.position.y = game.rnd.integerInRange(100, 400);
 
             current.body.velocity.x = -this.player.getVelocityX();
         }
 
+        for(i = 0; i < this.randomWalls.length; i++){
+
+            current = this.randomWalls.getAt(i);
+
+            if(i < 3){
+                current.position.x = 800 + (i * 800); // set walls x position
+
+                // randomly choose if its on the roof or floor based on a modulus remainder from
+                // 1 to 1000
+                if(this.game.rnd.integerInRange(1, 1000) % 2 == 0){
+                    current.position.y = 80;
+                }
+                else{
+                    current.position.y = 400;
+                }
+            }
+            else{  // this chooses where we'll put our 4th wall so we have a "double wall" where we can only go through the centre
+                var randPlace = (this.game.rnd.integerInRange(1, 1000) % 3);
+                current.position.x = 800 + (randPlace * 800); // position its x in one of our previous walls x areas
+
+                // checks what the wall at the current x positions y is and
+                // then sets it to the opposite of the current wall
+                if(GameState.wallPositions[randPlace][1] == 400){
+                    current.position.y = 80;
+                }else{
+                    current.position.y = 400;
+                }
+            }
+        }
+
         for(i = 0; i < this.floorAndRoof.length; i++){
-            var current = this.floorAndRoof.getAt(i);
+            current = this.floorAndRoof.getAt(i);
             current.body.velocity.x = -this.player.getVelocityX();
         }
 
@@ -269,6 +344,12 @@ GameState.Game.prototype = {
             current = this.obstacles.getAt(i);
             GameState.obstaclePosAndRot[i][0] = current.position.x;
             GameState.obstaclePosAndRot[i][1] = current.position.y;
+        }
+
+        for(i = 0; i < this.randomWalls.length; i++){
+            current = this.randomWalls.getAt(i);
+            GameState.wallPositions[i][0] = current.position.x;
+            GameState.wallPositions[i][1] = current.position.y;
         }
 
         GameState.playerPosition[0] = this.player.character.position.x;

@@ -87,13 +87,14 @@ GameState.Init.prototype = {
         GameState.obstaclePosAndRot = new Array();
         var currentArrayPos = 0;
         for(i2 = 0; i2 < 2; i2++)
-            for(i = 0; i < 4; i++)
+            for(i = 0; i < 12; i++)
             {
                 var ranMax, ranMin;
-                ranMin = 800 + (i * 400);
-                ranMax = 800 + (i * 400) + 400;
+                ranMin = 832 + (i * 200);
+                ranMax = ranMin + 136; // 136 = 200 - 64 (the spikes are centered so to avoid overlaps we must leave a space of 16 for each spike inbetween)
                 GameState.obstaclePosAndRot[currentArrayPos] = new Array(); // making the ith position an array as well making obstaclePositions a 2d  array
                 GameState.obstaclePosAndRot[currentArrayPos][0] = this.game.rnd.integerInRange(ranMin, ranMax); // setting positions
+
 
                 if(i2 == 0)
                 {
@@ -111,25 +112,53 @@ GameState.Init.prototype = {
 
         // same as above
         GameState.platformPositions = new Array();
-        for(i = 0; i < 4; i++)
+        for(i = 0; i < 9; i++)
         {
             var ranMax, ranMin;
-            ranMin = 800 + (i * 400);
-            ranMax = 800 + (i * 400) + 400;
+
+            ranMin = 880 + (i * 266.67); // distance till next wall 800 / 3 platform count between walls = 266.67 pixels
+            // 128 * 2(total number of spaces required to space out platforms, 1 64 set per platform 3 linked together = 256)
+            // (space with - 160 taken from the start and end relating to 16 pixels from half the wall and 64 from the platforms * 2 for each wall
+            // so 800 - 160 = 640) 640 - 256 = 384 the space left to randomize the objects in. And now we divide it by the number of platforms to get
+            // 128! The space for each platform to randomize itself in.
+            ranMax = ranMin + 128;
+
             GameState.platformPositions[i] = new Array();
             GameState.platformPositions[i][0] = this.game.rnd.integerInRange(ranMin, ranMax);
-            GameState.platformPositions[i][1] = this.game.rnd.integerInRange(100, 440);
+            GameState.platformPositions[i][1] = this.game.rnd.integerInRange(100, 400);
         }
 
         GameState.wallPositions = new Array();
+
+        // we have 4 wall pieces in play at all times, 1 set of 2 walls(bit on floor and roof)
+        // and 2 sets of one wall randomly placed on the roof or floor
         for(i = 0; i < 4; i++){
             GameState.wallPositions[i] = new Array();
-            GameState.wallPositions[i][0] = 600;
 
-            if(i%2 == 0)
-                GameState.wallPositions[i][1] = 384;
-            else
-                GameState.wallPositions[i][1] = 96;
+            if(i < 3){
+                GameState.wallPositions[i][0] = 800 + (i * 800); // set walls x position
+
+                // randomly choose if its on the roof or floor based on a modulus remainder from
+                // 1 to 1000
+                if(this.game.rnd.integerInRange(1, 1000) % 2 == 0){
+                    GameState.wallPositions[i][1] = 80;
+                }
+                else{
+                    GameState.wallPositions[i][1] = 400;
+                }
+            }
+            else{  // this chooses where we'll put our 4th wall so we have a "double wall" where we can only go through the centre
+                var randPlace = (this.game.rnd.integerInRange(1, 1000) % 3);
+                GameState.wallPositions[i][0] = 800 + (randPlace * 800); // position its x in one of our previous walls x areas
+
+                // checks what the wall at the current x positions y is and
+                // then sets it to the opposite of the current wall
+                if(GameState.wallPositions[randPlace][1] == 400){
+                    GameState.wallPositions[i][1] = 80;
+                }else{
+                    GameState.wallPositions[i][1] = 400;
+                }
+            }
         }
 
         // positions for the floor and roof bricks based on there center point
