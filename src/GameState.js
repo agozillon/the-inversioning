@@ -7,7 +7,7 @@
  * standard template. Would be termed a "Singleton" class in other languages, variables shared
  * across all states can be stored here. OF NOTE: All States added to the GameState class and then Phaser State
  * have instant access to the Phaser game, add, camera, cache, input, load, math, sound, stage, time, tweens, world
- * particles, physics, rnd
+ * particles, physics and rnd
  * @constructor */
 var GameState = {
     platformPositions: null,

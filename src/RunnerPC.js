@@ -10,12 +10,14 @@
  * @param {number} scaleY - height scale of RunnerPC sprite
  * @param {number} rot - rotation of RunnerPC
  * @param {number} gravity - amount of downward force applied to the RunnerPC
- * @param {number} drag - amount of opposing force applied to the RunnerPC whenever it moves
- * @param {string} sprite - string that's a key of an image loaded in via Phasers load.image function
- * @param {game} game - phaser game object to allow access to game specific functions
+ * @param {number} runSpeed - speed the character regularly moves at without boost
+ * @param {number} boostSpeed - speed the character moves at when boost is pressed
+ * @param {string} animatedSprite - string that's a key of an image loaded in via Phasers load.image function
+ * @param {number} spriteFps - the frames per second that the animated sprite should iterate through its animations at
+ * @param {Phaser.Game} game - phaser game object to allow access to game specific functions
  * @constructor
  * */
- function RunnerPC(posX, posY, scaleX, scaleY, rot, gravity, animatedSprite, spriteFps, game){
+ function RunnerPC(posX, posY, scaleX, scaleY, rot, gravity, runSpeed, boostSpeed, animatedSprite, spriteFps, game){
     this.game = game;
     this.character = this.game.add.sprite(posX, posY, animatedSprite);
     this.character.animations.add('run');
@@ -31,43 +33,32 @@
     this.game.physics.enable(this.character, Phaser.Physics.ARCADE);
     this.character.body.moves = false;
     this.character.body.collideWorldBounds = true;
-    this.boostVelocityX = 500;
-    this.runVelocityX = 100;
+    this.boostVelocityX = boostSpeed;
+    this.runVelocityX = runSpeed;
     this.velocityX = this.runVelocityX;
-    this.velocityY = 10;
+    this.velocityY = gravity;
     this.game.camera.follow(this.character, this.game.camera.FOLLOW_PLATFORMER);
 
 
     // inversion timer mostly just to create a lag before you can press
     // so it doesn't double activate and cancel itself out
     this.inversionTimer = 0;
-    this.inversionCooldown = 500;
+    this.inversionCooldown = 200;
     this.score = 0;
     this.onFloor = false;
 
     // relevant to create a cooldown interval between boost presses, this one is
     // a gameplay mechanic
     this.boostCooldownTimer = 0;
-    this.boostCooldown = 2000;
+    this.boostCooldown = 1000;
     this.boostActivationTimer = 0;
-    this.boostActivationPeriod = 2000;
+    this.boostActivationPeriod = 750;
     this.boostActive = false;
 }
 
-/**
- * function for changing the players position
- * @public
- * @function
- * @param {number} posX - value to replace the current x position with
- * @param {number} posY - value to replace the current y position with
- */
-RunnerPC.prototype.updatePosition = function(posX, posY){
-   this.character.position.x = posX;
-   this.character.position.y = posY;
-};
 
 /**
- * returns this RunnerPC's score
+ * Function that returns this RunnerPC's score
  * @public
  * @function
  * @returns {number}
@@ -75,7 +66,49 @@ RunnerPC.prototype.updatePosition = function(posX, posY){
 RunnerPC.prototype.getScore = function(){
     return Math.round(this.score);
 };
+
 /**
+ * Function that returns this RunnerPC's x position
+ * @public
+ * @function
+ * @returns {number}
+ */
+RunnerPC.prototype.getPositionX = function (){
+    return this.character.position.x;
+};
+
+/**
+ * Function that returns this RunnerPC's scale on the x plane
+ * @public
+ * @function
+ * @returns {number}
+ */
+RunnerPC.prototype.getScaleX = function(){
+    return this.character.scale.x;
+};
+
+/**
+ * Function that returns this RunnerPC's rotation
+ * @public
+ * @function
+ * @returns {number}
+ */
+RunnerPC.prototype.getRotation = function(){
+    return this.character.angle;
+};
+
+/**
+ * Function that returns this RunnerPC's y position
+ * @public
+ * @function
+ * @returns {number}
+ */
+RunnerPC.prototype.getPositionY = function (){
+    return this.character.position.y;
+};
+
+/**
+ * Function that updates the players current score to a value you pass in
  * @public
  * @function
  * @param {number} score - a number to set the current score value to
@@ -85,6 +118,7 @@ RunnerPC.prototype.updateScore = function(score){
 };
 
 /**
+ * Function that updates the players onFloor variable to the value you pass in
  * @public
  * @function
  * @param {boolean} isOnFloor - simple boolean that changes the onFloor variable which
@@ -95,7 +129,7 @@ RunnerPC.prototype.updateOnFloor = function(isOnFloor){
 };
 
 /**
- * This function can be called seperately anywhere you wish, however it's mainly for use in conjunction with the Phaser
+ * Function that can be called separately anywhere you wish, however it's mainly for use in conjunction with the Phaser
  * collide function as a callback function, so that whenever a Phaser object collides with the player it calls this function.
  * Essentially all this does is seperate the two colliding objects on the Y axis so that they're still colliding (just touching)
  * but no longer half way inside each other.
@@ -142,7 +176,7 @@ RunnerPC.prototype.boost = function(){
 };
 
 /**
- * Function that reset all the players variables to default
+ * Function that reset all the players variables to there default
  * @public
  * @function
  */
@@ -156,51 +190,48 @@ RunnerPC.prototype.reset = function(){
     this.inversionTimer = 0;
     this.velocityY = 10;
     this.character.position.y = 434;
-}
-
-/**
- * function for changing the players velocity
- * @public
- * @function
- * @param {number} vX - value to replace the current x velocity with
- */
-RunnerPC.prototype.updateVelocityX = function(vX){
-  this.velocityX = vX;
 };
 
 /**
- * returns velocity x
+ * Function that returns the players x velocity
  * @public
  * @function
- * @returns {b.Physics.Arcade.Body.velocity.x|*}
+ * @returns {number}
  */
 RunnerPC.prototype.getVelocityX = function(){
     return this.velocityX;
 };
 
 /**
- * update function that keeps track of relevant timing for the RunnerPC
- * and various other update logic for the RunnerPC to function
+ * Function that keeps track of relevant timing for the activation abilities of the
+ * RunnerPC, increments the players score, updates the characters y position, (x never moves
+ * objects move to it) and various other update logic for the RunnerPC to function
  * @public
- * @function */
+ * @function
+ * */
 RunnerPC.prototype.update = function(){
 
-    if(this.onFloor == false)
+    // continually apply gravity unless we're on the ground (platform, roof or floor) or
+    // the player has activated boost!
+    if(this.onFloor == false && this.boostActive == false)
        this.character.position.y += this.velocityY;
 
+    // get the elapsed time and add it onto the inversion timer and calculate the score
     var elapsedTime = this.game.time.elapsed;
-
     this.inversionTimer += elapsedTime;
-
     // calculating the distance travelled by the character using velocity and acceleration and using it as the score
     this.score += this.velocityX * (1/1000 * elapsedTime);
 
 
+    // if boost active is false add elapsed time on to the cooldown timer, if its active add it onto
+    // the activation timer
     if(this.boostActive == false)
         this.boostCooldownTimer += elapsedTime;
     else
         this.boostActivationTimer += elapsedTime;
 
+    // if active and its been active less than the activation time period then continue to apply boost velocity to
+    // the world objects else set the activation timer to 0, set it to false and use normal run velocity.
     if(this.boostActive == true && this.boostActivationTimer < this.boostActivationPeriod){
         this.velocityX = this.boostVelocityX;
     }else{

@@ -15,8 +15,9 @@
  * @param {number} scaleY - height scale of the WorldObject sprite
  * @param {number} rot - rotation of the WorldObject sprite
  * @param {string} sprite - string that's a key of an image loaded in via Phasers load.image function
- * @param {Game} game - phaser game object to allow access to game specific functions
- * @param {Group} group - link to a phaser group object to allow all the WorldObject objects to be added to a group
+ * @param {Phaser.Game} game - phaser game object to allow access to game specific functions
+ * @param {Phaser.Group} group - link to a phaser group object to allow all the WorldObject objects to be added to a group
+ * @param {boolean} leftCollideable - a boolean that dictates if the player can collide with its left side, true for yes, false for no
  * that allows for easy collision checking etc.!
  * */
 function WorldObject(posX, posY, scaleX, scaleY, rot, sprite, game, group, leftCollideable){

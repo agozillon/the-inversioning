@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: WorldObject</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Class: WorldObject</h1>
+    
+    
+
+
+
+<section>
+    
+<header>
+    <h2>
+    WorldObject
+    </h2>
+    
+</header>  
+
+<article>
+    <div class="container-overview">
+    
+    
+    
+        
+<dt>
+    <h4 class="name" id="WorldObject"><span class="type-signature"></span>new WorldObject<span class="signature">(posX, posY, scaleX, scaleY, rot, sprite, game, group, leftCollideable)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        WorldObject is an object intended to be the platforms and obstacles in the game which the player cancan interact with. I.E Obstacles kill the player and Platforms allow the player to walk on themthere is nothing that sets the two apart other than how they interact with the player in the game loop
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>posX</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">position of WorldObject on the x plane</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>posY</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">position of WorldObject on the y plane, positive is down</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>scaleX</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">width scale of the WorldObject sprite</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>scaleY</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">height scale of the WorldObject sprite</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>rot</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">rotation of the WorldObject sprite</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>sprite</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">string that's a key of an image loaded in via Phasers load.image function</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>game</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Phaser.Game</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">phaser game object to allow access to game specific functions</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>group</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Phaser.Group</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">link to a phaser group object to allow all the WorldObject objects to be added to a group</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>leftCollideable</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a boolean that dictates if the player can collide with its left side, true for yes, false for nothat allows for easy collision checking etc.!</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+    
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</article>
+
+</section>  
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="GameOverScoreState.html">GameOverScoreState</a></li><li><a href="GameOverScreenState.html">GameOverScreenState</a></li><li><a href="GameOverStateManager.html">GameOverStateManager</a></li><li><a href="GameState.html">GameState</a></li><li><a href="GameState.Game.html">Game</a></li><li><a href="GameState.Highscores.html">Highscores</a></li><li><a href="GameState.Init.html">Init</a></li><li><a href="GameState.MainMenu.html">MainMenu</a></li><li><a href="GameState.Tutorial.html">Tutorial</a></li><li><a href="HighscoreEntry.html">HighscoreEntry</a></li><li><a href="HighscoreTable.html">HighscoreTable</a></li><li><a href="RunnerPC.html">RunnerPC</a></li><li><a href="WorldObject.html">WorldObject</a></li></ul><h3>Global</h3><ul><li><a href="global.html#game">game</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri May 02 2014 06:45:45 GMT+0100 (BST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

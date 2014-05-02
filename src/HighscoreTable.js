@@ -1,19 +1,23 @@
 /**
  * Created by ANDREW on 22/04/14.
  */
-/** Creates the Highscore Table Object, which is a table that holds the top 10 scores in the game
+/**
+ * Creates the Highscore Table Object, which is a table that holds the top 10 scores in the game, renders them on screen as
+ * Phaser Text objects, has a function to pull them from an online databases and push them to an online database
  *@constructor
- *@param {Object} game a link to an instantiated Phaser Game Object */
+ *@param {Phaser.Game} game a link to an instantiated Phaser Game Object
+ *  */
 function HighscoreTable(game){
     this.scores = ['', '', '', '', '', '', '', '', '', ''];
     this.names = ['','', '', '', '', '', '', '', '', ''];
-    this.highscoreListText = new Array();
+    this.highscoreListText = [];
     this.game = game;
-    this.createText();
-};
+    this.createText(); // early call of createText to set the texts fonts otherwise we can get the occasional error when entering the score
+    // also the reason that if the init fails the highscore displays blank!
+}
 
 /**
- * Highsore table add function, adds a score to the table which consists of two separate arrays
+ * Function that adds a score to the table which consists of two separate arrays
  * holding a name and a score and a phaser text object
  * @param {string} name - name of the current player playing
  * @param {number} score - number that denotes the players score that's getting added to the table
@@ -40,13 +44,14 @@ HighscoreTable.prototype.add = function(name, score, arrayPosition){
             }
         }
 
+    // sends the highscores to the online database
     for(i = 0; i < this.highscoreListText.length; i++)
         if(this.scores[i])
             this.postHighscore(i);
 };
 
 /**
- * getHighscoreTable function it pulls all of the highscore data from the google app engine server
+ * Function that pulls all of the highscore data from the google app engine server.
  * There can be up to 10 unique values stored at a time (1 for each position)
  * @public
  * @function
@@ -55,17 +60,18 @@ HighscoreTable.prototype.getHighscoreTable = function(){
     "use strict";
 
     var tmpSelfRef = this; // temp reference to highscore so we can access it within
+
     // basic Ajax server call to the google app server, it should be up at all times if you have
     // any problems please contact b00234203@studentmail.uws.ac.uk
     $.ajax({
         type: "GET",
-        url: "http://aghighscore.appspot.com", // "http://localhost:9080"
+        url: "https://aghighscore.appspot.com",
         async: true,
         contentType: "application/json",
         dataType: "jsonp",
         success: function(resp){
             var i, tmpPos;
-            for(i = 0; i < resp.length; i++){
+            for(i = 0; i < resp.length; i++){ // adds them into the table on successful call to the database
                 tmpPos = parseInt(resp[i].position, 10);
                 tmpSelfRef.scores[tmpPos] = parseInt(resp[i].score, 10);
                 tmpSelfRef.names[tmpPos] = resp[i].playerName;
@@ -75,7 +81,7 @@ HighscoreTable.prototype.getHighscoreTable = function(){
 };
 
 /**
- * Simple function that uses Ajax to send a highscore value to the Google app engine server
+ * Function that uses Ajax to send a highscore value to the Google app engine server
  * @param {number} pos - number that defines the position of the highscore in the table it'll be used as a unique key by the server
  * replacing any previous highscore with that key
  * @public
@@ -85,7 +91,7 @@ HighscoreTable.prototype.postHighscore = function(pos){
     "use strict";
 
     // name key - position in the highscore table, score - player score, player name - player name
-    var url = "http://aghighscore.appspot.com" + "/loc?name=" + pos + "&score=" + this.scores[pos] + "&playerName=" + this.names[pos];
+    var url = "https://aghighscore.appspot.com" + "/loc?name=" + pos + "&score=" + this.scores[pos] + "&playerName=" + this.names[pos];
     $.ajax({
         type: "GET",
         url: url,
@@ -93,14 +99,14 @@ HighscoreTable.prototype.postHighscore = function(pos){
         contentType: "application/json",
         dataType: "jsonp"
     })
-}
+};
 
 /**
- * function that returns true if the score is a highscore or false if its not a highscore on the table
+ * Function that returns true if the score is a highscore or false if its not a highscore on the table
  * @param {number} score - number that denotes the players score that we're checking against the table
  * @public
  * @function
- * @return {boolean} - denotes if its a highscore or not based on true for yes, and false for no
+ * @return {boolean}
  */
 HighscoreTable.prototype.isItAHighscore = function(score){
 
@@ -117,7 +123,7 @@ HighscoreTable.prototype.isItAHighscore = function(score){
 };
 
 /**
- * createText is a function that creates all of the Highscore text as Phaser text objects capable of being rendered to screen
+ * Function that creates all of the Highscore text as Phaser text objects capable of being rendered to screen
  * it also positions them appropriately on the screen for them to be positioned as a highscore table, all phaser objects get deleted
  * on state switch
  * @public
