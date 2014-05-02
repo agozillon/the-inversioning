@@ -11,3 +11,6 @@ License: Unknown posted on forum for Art and appears to be open source
 "Cut and Run" Kevin MacLeod (incompetech.com) 
 Licensed under Creative Commons: By Attribution 3.0
 http://creativecommons.org/licenses/by/3.0/
+
+bluesprite.png Callum Lyons (UWS Student, Worked with during Game Jam and created this character)
+License: asked and said I’m allowed!

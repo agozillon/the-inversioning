@@ -52,7 +52,7 @@
     this.boostCooldownTimer = 0;
     this.boostCooldown = 1000;
     this.boostActivationTimer = 0;
-    this.boostActivationPeriod = 750;
+    this.boostActivationPeriod = 500;
     this.boostActive = false;
 }
 

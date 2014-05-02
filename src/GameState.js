@@ -10,11 +10,8 @@
  * particles, physics and rnd
  * @constructor */
 var GameState = {
-    platformPositions: null,
-    obstaclePositions: null,
     backgroundScrollX: null,
     playerPosition: null,
-    floorAndRoofPositions: null,
-    wallPositions: null,
-    highscoreTable: null
+    highscoreTable: null,
+    gameWorld: null
 };

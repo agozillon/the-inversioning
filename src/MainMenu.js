@@ -14,7 +14,6 @@ GameState.MainMenu = function () {
     this.floorAndRoof = null;
     this.randomWalls = null;
     this.player = null;
-    this.music = null;
     this.playButton = null;
     this.tutorialButton = null;
     this.highscoresButton = null;
@@ -34,7 +33,6 @@ GameState.MainMenu.prototype = {
         this.background = game.add.tileSprite(0,0, game.world.width, game.world.height,'background');
         this.background.tilePosition.x = GameState.backgroundScrollX;
 
-
         // if the music hasn't been instantiated then add the audio track (phaser audio plays and remains between states
         if(this.music == null)
             this.music = game.add.audio('soundtrack');
@@ -47,23 +45,7 @@ GameState.MainMenu.prototype = {
 
         // World Object creation, has to be done each time in phaser, unfortunately can't pass objects
         // between states
-        this.obstacles = game.add.group();
-        for(i = 0; i < GameState.obstaclePosAndRot.length; i++)
-            new WorldObject(GameState.obstaclePosAndRot[i][0], GameState.obstaclePosAndRot[i][1], 1.0, 1.0, GameState.obstaclePosAndRot[i][2], 'spikes', game, this.obstacles, true);
-
-
-        this.randomPlatforms = game.add.group();
-        for(i = 0; i < GameState.platformPositions.length; i++)
-            new WorldObject(GameState.platformPositions[i][0], GameState.platformPositions[i][1], 1.0, 1.0, 0,'platformMetal', game, this.randomPlatforms, false);
-
-
-        this.floorAndRoof = game.add.group();
-        for(i = 0; i < GameState.floorAndRoofPositions.length; i++)
-            new WorldObject(GameState.floorAndRoofPositions[i][0], GameState.floorAndRoofPositions[i][1], 1.0, 1.0, 0,'platform', game, this.floorAndRoof, true);
-
-        this.randomWalls = game.add.group();
-        for(i = 0; i < GameState.wallPositions.length; i++)
-            new WorldObject(GameState.wallPositions[i][0], GameState.wallPositions[i][1], 1.0, 1.0, 0, 'wall', game, this.randomWalls, false);
+        GameState.gameWorld.create(game);
 
         this.player = new RunnerPC(GameState.playerPosition[0], GameState.playerPosition[1], GameState.playerPosition[2], 1.0, GameState.playerPosition[3], 10.0, 100.0, 500.0,'character', 48, game);
 

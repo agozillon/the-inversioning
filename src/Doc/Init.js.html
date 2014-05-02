@@ -107,95 +107,8 @@ GameState.Init.prototype = {
             game.scale.refresh();
         }
 
-        // initial positioning of the world, mostly for the backgrounds sake until we start playing
-        GameState.obstaclePosAndRot = [];
-        var currentArrayPos = 0; // used as the first dimension iterator in the array below, unable to use i2 and i as there used for other things
-        for(var i2 = 0; i2 &lt; 2; i2++)
-            for(var i = 0; i &lt; 12; i++)
-            {
-                var ranMax, ranMin;
-                ranMin = 832 + (i * 200); // 800 + 32(for width of wall and obstacle), 200 extra pixels for the 4 we can fit within the walls space
-                ranMax = ranMin + 136; // 136 = 200 - 64 (the spikes are centered so to avoid overlaps we must leave a space of 16 for each spike inbetween)
-                GameState.obstaclePosAndRot[currentArrayPos] = []; // making the ith position an array as well making obstaclePositions a 2d array
-                GameState.obstaclePosAndRot[currentArrayPos][0] = game.rnd.integerInRange(ranMin, ranMax); // setting positions
-
-
-                if(i2 == 0) // i2 = 0 is the top set of obstacles, i2 = 1 is the bottom set of obstacles
-                {
-                   GameState.obstaclePosAndRot[currentArrayPos][1] = 30;  // y position
-                   GameState.obstaclePosAndRot[currentArrayPos][2] = 180; // rotation
-                }
-                else
-                {
-                    GameState.obstaclePosAndRot[currentArrayPos][1] = 448; // y position
-                    GameState.obstaclePosAndRot[currentArrayPos][2] = 0;   // rotation
-                }
-
-                currentArrayPos++;
-            }
-
-        // same as above except with the math explained in a bit more detail
-        GameState.platformPositions = [];
-        for(i = 0; i &lt; 9; i++)
-        {
-            ranMin = 800 + 80 + (i * 266.67); // distance till next wall 800 / 3 platform count between walls = 266.67 pixels
-            // 128 * 2(total number of spaces required to space out platforms, 1 64 set per platform 3 linked together = 256)
-            // (space with - 160 taken from the start and end relating to 16 pixels from half the wall and 64 from the platforms * 2 for each wall
-            // so 800 - 160 = 640) 640 - 256 = 384 the space left to randomize the objects in. And now we divide it by the number of platforms to get
-            // 128! The space for each platform to randomize itself in.
-            ranMax = ranMin + 128;
-
-            GameState.platformPositions[i] = [];
-            GameState.platformPositions[i][0] = game.rnd.integerInRange(ranMin, ranMax);
-            GameState.platformPositions[i][1] = game.rnd.integerInRange(100, 400);
-        }
-
-        GameState.wallPositions = [];
-
-        // we have 4 wall pieces in play at all times, 1 set of 2 walls(bit on floor and roof)
-        // and 2 sets of one wall randomly placed on the roof or floor and we space them all 800 apart
-        // so the whole placement of the objects is based on the idea of the space between each wall
-        // being a "room"
-        for(i = 0; i &lt; 4; i++){
-            GameState.wallPositions[i] = [];
-
-            if(i &lt; 3){
-                GameState.wallPositions[i][0] = 800 + (i * 800); // set walls x position
-
-                // randomly choose if its on the roof or floor based on a modulus remainder from
-                // 1 to 1000
-                if(this.game.rnd.integerInRange(1, 1000) % 2 == 0){
-                    GameState.wallPositions[i][1] = 80;
-                }
-                else{
-                    GameState.wallPositions[i][1] = 400;
-                }
-            }
-            else{  // this chooses where we'll put our 4th wall so we have a "double wall" where we can only go through the centre
-                var randPlace = (this.game.rnd.integerInRange(1, 1000) % 3);
-                GameState.wallPositions[i][0] = 800 + (randPlace * 800); // position its x in one of our previous walls x areas
-
-                // checks what the wall at the current x positions y is and
-                // then sets it to the opposite of the current wall
-                if(GameState.wallPositions[randPlace][1] == 400){
-                    GameState.wallPositions[i][1] = 80;
-                }else{
-                    GameState.wallPositions[i][1] = 400;
-                }
-            }
-        }
-
-        // positions for the floor and roof bricks based on there center point
-        GameState.floorAndRoofPositions = [];
-        currentArrayPos = 0;
-        for(i2 = 1; i2 > -1; i2--)
-            for(i = 1; i &lt; 10; i++)
-            {
-                GameState.floorAndRoofPositions[currentArrayPos] = [];
-                GameState.floorAndRoofPositions[currentArrayPos][0] = (i * 160)-80; // each floor piece is 160 so get its position and then negate half its width to get the position based off its center
-                GameState.floorAndRoofPositions[currentArrayPos][1] = i2 * 480; // y if i2 is one its a floor piece
-                currentArrayPos++;
-            }
+        // Instantiates the GameWorldManager which randomizes all the World Objects positions
+        GameState.gameWorld = new GameWorldManager(game, 800, 128, 16, 32, 160, 4, 1, 9, 3, 24, 8);
 
         GameState.backgroundScrollX = 0;
 
@@ -208,6 +121,7 @@ GameState.Init.prototype = {
         // instantiate the HighscoreTable and pull the highscores from the servers database
         GameState.highscoreTable = new HighscoreTable(game);
         GameState.highscoreTable.getHighscoreTable();
+
 
          // the relevant windows created and all preloads have started, switch to menu
         game.state.start('Menu');
@@ -224,13 +138,13 @@ GameState.Init.prototype = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="GameOverScoreState.html">GameOverScoreState</a></li><li><a href="GameOverScreenState.html">GameOverScreenState</a></li><li><a href="GameOverStateManager.html">GameOverStateManager</a></li><li><a href="GameState.html">GameState</a></li><li><a href="GameState.Game.html">Game</a></li><li><a href="GameState.Highscores.html">Highscores</a></li><li><a href="GameState.Init.html">Init</a></li><li><a href="GameState.MainMenu.html">MainMenu</a></li><li><a href="GameState.Tutorial.html">Tutorial</a></li><li><a href="HighscoreEntry.html">HighscoreEntry</a></li><li><a href="HighscoreTable.html">HighscoreTable</a></li><li><a href="RunnerPC.html">RunnerPC</a></li><li><a href="WorldObject.html">WorldObject</a></li></ul><h3>Global</h3><ul><li><a href="global.html#game">game</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="GameOverScoreState.html">GameOverScoreState</a></li><li><a href="GameOverScreenState.html">GameOverScreenState</a></li><li><a href="GameOverStateManager.html">GameOverStateManager</a></li><li><a href="GameState.html">GameState</a></li><li><a href="GameState.Game.html">Game</a></li><li><a href="GameState.Highscores.html">Highscores</a></li><li><a href="GameState.Init.html">Init</a></li><li><a href="GameState.MainMenu.html">MainMenu</a></li><li><a href="GameState.Tutorial.html">Tutorial</a></li><li><a href="GameWorldManager.html">GameWorldManager</a></li><li><a href="HighscoreEntry.html">HighscoreEntry</a></li><li><a href="HighscoreTable.html">HighscoreTable</a></li><li><a href="RunnerPC.html">RunnerPC</a></li><li><a href="WorldObject.html">WorldObject</a></li></ul><h3>Global</h3><ul><li><a href="global.html#game">game</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri May 02 2014 06:45:44 GMT+0100 (BST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri May 02 2014 13:07:46 GMT+0100 (BST)
 </footer>
 
 <script> prettyPrint(); </script>
