@@ -64,7 +64,7 @@ GameOverScreenState.prototype.create = function(game, gameOverControl, playGameS
 
     this.backToMenuButton = game.add.sprite((game.world.width / 2), (game.world.height / 2) + 100,'backToMenuButton');
     this.backToMenuButton.inputEnabled = true;
-    this.backToMenuButton.events.onInputDown.add(function(){playGameState.setPositions(); game.state.start('Menu')}, game);
+    this.backToMenuButton.events.onInputDown.add(function(){playGameState.setPositions(); game.state.start('Menu'); }, game);
     this.backToMenuButton.anchor.setTo(0.5, 0.5); // changes the point where its positioned from the Anchor point
     this.backToMenuButton.scale.x = 0.75;
     this.backToMenuButton.scale.y = 0.5;

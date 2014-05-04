@@ -25,6 +25,7 @@ GameState.Init.prototype = {
     preload: function(){
         game.load.audio('soundtrack', 'src/audio/Cut and Run.ogg' );
         game.load.image('boostButton', 'src/images/boostButton.png');
+        game.load.image('tombstone', 'src/images/tombstone.png');
         game.load.image('invertGravityButton', 'src/images/invertGravityButton.png');
         game.load.image('tutorialDisplay', 'src/images/tutorial.png');
         game.load.image('platform', 'src/images/platform.png');
@@ -85,11 +86,12 @@ GameState.Init.prototype = {
 
         GameState.backgroundScrollX = 0;
 
-        GameState.playerPosition = [];
-        GameState.playerPosition[0] = 450; // x position
-        GameState.playerPosition[1] = 434; // y position
-        GameState.playerPosition[2] = 1;   // scale
-        GameState.playerPosition[3] = 0;   // rotation
+        GameState.playerVariables = [];
+        GameState.playerVariables[0] = 450; // x position
+        GameState.playerVariables[1] = 434; // y position
+        GameState.playerVariables[2] = 1;   // scale
+        GameState.playerVariables[3] = 0;   // rotation
+        GameState.playerVariables[4] = 1;   // isAlive
 
         // instantiate the HighscoreTable and pull the highscores from the servers database
         GameState.highscoreTable = new HighscoreTable(game);

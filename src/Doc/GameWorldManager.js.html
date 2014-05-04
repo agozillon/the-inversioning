@@ -83,6 +83,7 @@ function GameWorldManager(game, spaceBetweenWalls, platformSpriteWidth, wallSpri
  * @public
  */
 GameWorldManager.prototype.create = function(){
+
     // loops through all the positions we have and creates WorldObjects from them and adds them to groups for easy use and access by Phaser
     this.obstacles = game.add.group();
     for(var i = 0; i &lt; this.obstaclePositions.length; i++)
@@ -196,6 +197,38 @@ GameWorldManager.prototype.reset = function(){
 };
 
 /**
+ * Function that saves all of the the GameWorldManagers WorldObjects positions to the internal position variables
+ * if we don't do this then when the states change the Groups that contain the WorldObject's internal image get deleted
+ * and we lose the position. We can still use its original position but we need there last known position for displaying
+ * them on screen through different states
+ * @public
+ * @function
+ */
+GameWorldManager.prototype.positionSave = function(){
+
+    this.floorAndRoofPositions = this.floorAndRoofPlacement(480);
+    for(i = 0; i &lt; this.platforms.length; i++){
+        var current = this.platforms.getAt(i);
+        this.platformPositions[i][0] = current.position.x;
+    }
+
+    for(i = 0; i &lt; this.obstacles.length; i++){
+        current = this.obstacles.getAt(i);
+        this.obstaclePositions[i][0] = current.position.x;
+    }
+
+    for(i = 0; i &lt; this.walls.length; i++){
+        current = this.walls.getAt(i);
+        this.wallPositions[i][0] = current.position.x;
+    }
+
+    for(i = 0; i &lt; this.floorAndRoof.length; i++){
+        current = this.floorAndRoof.getAt(i);
+        this.floorAndRoofPositions[i][0] = current.position.x;
+    }
+};
+
+/**
  * Function that updates all the WorldObjects Phaser Group's updates there x position constantly incase of speed boosts and repositions all of
  * them when they go off screen
  * @param {number} playerVelocityX - value that dictates the speed the world moves towards the player at should be the players current velocity on the X
@@ -214,16 +247,17 @@ GameWorldManager.prototype.update = function(playerVelocityX){
         // if its off the left side of the screen
         if(current.position.x &lt;= -80)
         {
-            // randomize the obstacle, similar to the random placement in init except that it bases
-            // the minimum position of the last position of the newest positioned wall(wallIterator)
+            // randomize the obstacle, similar to the obstaclesRandomiation function except that it bases
+            // the minimum position off the last position of the newest positioned wall(wallIterator)
             var ranMax, ranMin;
-            ranMin = this.walls.getAt(this.wallIterator).position.x + this.obstacleWidth + Math.floor(this.obstaclesIterator / 2) * this.spaceBetweenWalls / (this.obstaclesPerRoom / 2);
-            ranMax = ranMin + (this.spaceBetweenWalls / this.obstaclesPerRoom) - (this.obstacleWidth + this.wallHalfWidth);
+            ranMin = this.walls.getAt(this.wallIterator).position.x + this.obstacleWidth + (Math.floor(this.obstaclesIterator / 2) * this.spaceBetweenWalls / (this.obstaclesPerRoom / 2));
+            ranMax = ranMin + (this.spaceBetweenWalls / (this.obstaclesPerRoom / 2)) - (this.obstacleWidth + this.wallHalfWidth);
 
             this.obstaclesIterator++;
+
             // sets obstacle iterator to 0 once it reaches 8 i.e do the top obstacle placement then bottom of the
             // section and then reset to replace them all again
-            if(this.obstaclesIterator >= 8)
+            if(this.obstaclesIterator >= this.obstaclesPerRoom)
                 this.obstaclesIterator = 0;
 
             // randomize its x position
@@ -235,8 +269,8 @@ GameWorldManager.prototype.update = function(playerVelocityX){
         current.body.velocity.x = -playerVelocityX;
     }
 
+    // just calculating it out here so it only gets done once
     var spaceBetweenObjects = this.wallHalfWidth + (this.platformWidth / 2);
-
 
     // loops through the platforms positions them if they go off screen and sets
     // there velocity to the inverse of the players (we're not moving the player
@@ -245,14 +279,16 @@ GameWorldManager.prototype.update = function(playerVelocityX){
     for(i = 0; i &lt; this.platforms.length; i++){
         current = this.platforms.getAt(i);
 
-        // works essentially the same as the one above just slightly different maths for positioning
+        // randomize the platforms, similar to the platformRandomiation function except that it bases
+        // the minimum position off the last position of the newest positioned wall(wallIterator)
         if(current.position.x &lt;= -80){
             ranMin = this.walls.getAt(this.wallIterator).position.x  + spaceBetweenObjects + (this.platformIterator * this.spaceBetweenWalls / this.platformPerRoom);
             ranMax = ranMin + (800 - ((spaceBetweenObjects * 2) + ((this.platformWidth / 2) * ((this.platformPerRoom * 2) - 2)))) / this.platformPerRoom;
 
             this.platformIterator++;
 
-            if(this.platformIterator >= 3)
+            // resets the iterator to 0 as we're positioning them on a per room basis from the wall
+            if(this.platformIterator >= this.platformPerRoom)
                 this.platformIterator = 0;
 
             current.position.x = game.rnd.integerInRange(ranMin, ranMax);
@@ -272,8 +308,7 @@ GameWorldManager.prototype.update = function(playerVelocityX){
         // we always place it alongside another wall
         var lastWall = this.walls.getAt(3);
 
-
-        // works a bit differently to the others in this case we position them
+        // works similar to the WallRandomization function
         if(current.position.x &lt;= -80){
             current.position.x = this.spaceBetweenWalls * (this.wallCount - this.doubleWalls); // furthest away point on the x where the walls can spawn
 
@@ -346,13 +381,13 @@ GameWorldManager.prototype.platformRandomizer = function(maxHeight, minHeight){
 
     for(var i = 0; i &lt; this.platformCount; i++)
     {
+        // essentially all the maths is to position the platforms between the walls and not inside them
+        // distance till next wall = spaceBetweenWalls / platformsPerRoom * the iterator to increment it
+        // + spaceBetweenObjects is to make sure it doesn't end up in at least the first wall &amp; the math at the ranMax is to get
+        // the space inbetween that we can randomize the platform so that it's not inside another platform and not inside a wall (works for the most part
+        // has occasional difficulty with the walls on the right of the platforms)
         var ranMin = this.spaceBetweenWalls + spaceBetweenObjects + (i * this.spaceBetweenWalls / this.platformPerRoom);
-        // distance till next wall 800 / 3 platform count between walls = 266.67 pixels
-        // 128 * 2(total number of spaces required to space out platforms, 1 64 set per platform 3 linked together = 256)
-        // (space with - 160 taken from the start and end relating to 16 pixels from half the wall and 64 from the platforms * 2 for each wall
-        // so 800 - 160 = 640) 640 - 256 = 384 the space left to randomize the objects in. And now we divide it by the number of platforms to get
-        // 128! The space for each platform to randomize itself in.
-        var ranMax = ranMin + (800 - ((spaceBetweenObjects * 2) + ((this.platformWidth / 2) * ((this.platformPerRoom* 2) - 2)))) / this.platformPerRoom;
+        var ranMax = ranMin + (this.spaceBetweenWalls - ((spaceBetweenObjects * 2) + ((this.platformWidth / 2) * ((this.platformPerRoom* 2) - 2)))) / this.platformPerRoom;
 
         positions[i] = [];
         positions[i][0] = this.game.rnd.integerInRange(ranMin, ranMax);
@@ -380,8 +415,12 @@ GameWorldManager.prototype.obstacleRandomizer = function(topPosition, bottomPosi
     for(var i2 = 0; i2 &lt; 2; i2++)
         for(var i = 0; i &lt; this.obstacleCount / 2; i++)
         {
+            // same idea as above except the ranMax maths is slightly different and we divide the obstacles per room by two as we position
+            // half on the roof and half on the floor. The ranMax basically just gets the available space for each object between the two walls
+            // and then negates the width of the wall and obstacle from it to get the "true" available space to that obstacle without it
+            // touching another
             var ranMin = this.spaceBetweenWalls + spaceBetweenObjects + (i * this.spaceBetweenWalls / (this.obstaclesPerRoom / 2));
-            var ranMax = ranMin + (this.spaceBetweenWalls / this.obstaclesPerRoom) - (this.obstacleWidth + this.wallHalfWidth);
+            var ranMax = ranMin + (this.spaceBetweenWalls / (this.obstaclesPerRoom / 2)) - (this.obstacleWidth + this.wallHalfWidth);
 
             //(the spikes are centered so to avoid overlaps we must leave a space of 16 for each spike inbetween)
             positionsAndRotations[currentArrayPos] = []; // making the ith position an array as well making obstaclePositions a 2d array
@@ -419,8 +458,10 @@ GameWorldManager.prototype.wallRandomizer = function(topPosition, bottomPosition
     for(i = 0; i &lt; this.wallCount; i++){
         positions[i] = [];
 
+        // number of double walls detracts from the total wall count double walls are just essentially walls that
+        // get doubled up on the same X, one on the top and one on the bottom.
         if(i &lt; this.wallCount-this.doubleWalls){
-            positions[i][0] = 800 + (i * this.spaceBetweenWalls); // set walls x position
+            positions[i][0] = 800 + (i * this.spaceBetweenWalls); // set walls x position which is just the iterator * the space between walls
 
             // randomly choose if its on the roof or floor based on a modulus remainder from
             // 1 to 1000
@@ -483,7 +524,7 @@ GameWorldManager.prototype.floorAndRoofPlacement = function(floorMin){
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Fri May 02 2014 13:07:46 GMT+0100 (BST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Sat May 03 2014 19:11:53 GMT+0100 (BST)
 </footer>
 
 <script> prettyPrint(); </script>

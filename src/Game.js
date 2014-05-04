@@ -34,9 +34,6 @@ GameState.Game.prototype = {
         // creating our scrolling city background
         this.background = game.add.tileSprite(0, 0, game.world.width, game.world.height,'background');
 
-        // Creating our player
-        this.player = new RunnerPC(GameState.playerPosition[0], GameState.playerPosition[1], GameState.playerPosition[2], 1.0, GameState.playerPosition[3], 10.0, 100.0, 500.0,'character', 48, game);
-
         // World Object creation, has to be done each time a state changes in phaser, unfortunately can't pass objects
         // between states, music plays through states but is unchangeable sadly. Creating all our game world objects
         GameState.gameWorld.create(game);
@@ -45,6 +42,10 @@ GameState.Game.prototype = {
         // gravity inversion and boost
         this.inversionKey = game.input.keyboard.addKey(Phaser.Keyboard.W);
         this.boostKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+        // Creating our player
+        this.player = new RunnerPC(GameState.playerVariables[0], GameState.playerVariables[1], GameState.playerVariables[2], 1.0, GameState.playerVariables[3], 10.0, 100.0, 500.0,'character', 'tombstone', 48, game);
+        this.player.updateAlive(GameState.playerVariables[4]);
 
         // creating Phaser buttons attaching call back functions to the button (in this case a RunnerPC function)
         this.boostButton = this.add.button(game.world.width - 730, game.world.height - 35, 'boostButton', this.player.boost, this.player, 0, 0, 0, 0);
@@ -84,8 +85,6 @@ GameState.Game.prototype = {
         // if game over is false, i.e its running go through this loop
         if(this.gameOver == false)
         {
-            // updates the player
-            this.player.update();
 
             // scrolls the background slowly to the left
             this.background.tilePosition.x -= 0.2;
@@ -117,6 +116,9 @@ GameState.Game.prototype = {
                && this.resetTimer > 100)
                this.gameOver = true;
 
+            // updates the player
+            this.player.update();
+
             // just increment the reset timer if its less han 100, so the temporary invincibility ends
             if(this.resetTimer < 100)
                this.resetTimer += game.time.elapsed;
@@ -127,6 +129,10 @@ GameState.Game.prototype = {
         else // if game over is true then we loop through this, making a seperate game over state would have been more trouble than its worth in this context
         {
             if(this.gameStop == false){ // just a trigger to make sure we don't call the below more than once
+                GameState.gameWorld.freezeWorld();
+
+                this.player.updateAlive(false);
+                GameState.playerVariables[4] = 0;
 
                // checks if the score is a highscore or not by checking the highscore table
                // if it is then we switch it to the "good game over screen" where we can enter our
@@ -135,8 +141,6 @@ GameState.Game.prototype = {
                    this.gameOverState.stateSwitch(game, this.gameOverState.getGoodGameOverScreen(), this);
                else
                    this.gameOverState.stateSwitch(game, this.gameOverState.getBadGameOverScreen(), this);
-
-               GameState.gameWorld.freezeWorld();
 
                this.gameStop = true; // set it to true
             }
@@ -154,6 +158,7 @@ GameState.Game.prototype = {
     reset: function(){
 
         this.player.reset(); // reset function of RunnerPC resets all relevant player stats
+        GameState.playerVariables[4] = 1;
 
         // similar to the init states position loop except that we're required to work out which row
         // of obstacles we're on I.E top or bottom so we can position them appropriately
@@ -171,10 +176,12 @@ GameState.Game.prototype = {
      * @private
      * @function */
     setPositions: function(){
-        GameState.playerPosition[0] = this.player.getPositionX();
-        GameState.playerPosition[1] = this.player.getPositionY();
-        GameState.playerPosition[2] = this.player.getScaleX();
-        GameState.playerPosition[3] = this.player.getRotation();
+        GameState.playerVariables[0] = this.player.getPositionX();
+        GameState.playerVariables[1] = this.player.getPositionY();
+        GameState.playerVariables[2] = this.player.getScaleX();
+        GameState.playerVariables[3] = this.player.getRotation();
+
+        GameState.gameWorld.positionSave();
 
         GameState.backgroundScrollX = this.background.tilePosition.x;
     }

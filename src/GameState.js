@@ -11,7 +11,7 @@
  * @constructor */
 var GameState = {
     backgroundScrollX: null,
-    playerPosition: null,
+    playerVariables: null,
     highscoreTable: null,
     gameWorld: null
 };

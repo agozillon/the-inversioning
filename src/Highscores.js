@@ -7,10 +7,6 @@
 */
 GameState.Highscores = function () {
     this.background = null;
-    this.obstacles = null;
-    this.randomPlatforms = null;
-    this.floorAndRoof = null;
-    this.randomWalls = null;
     this.player = null;
     this.highscoreBackground = null;
     this.highscoreTitleText = null;
@@ -34,8 +30,9 @@ GameState.Highscores.prototype = {
         // between states, positions them off of the GameState held positions for each type of obstacle
         GameState.gameWorld.create(game);
 
-        // create the player a RunnerPC object
-        this.player = new RunnerPC(GameState.playerPosition[0], GameState.playerPosition[1], GameState.playerPosition[2], 1.0, GameState.playerPosition[3], 10.0, 100.0, 500.0,'character', 48, game);
+        // Creating our player
+        this.player = new RunnerPC(GameState.playerVariables[0], GameState.playerVariables[1], GameState.playerVariables[2], 1.0, GameState.playerVariables[3], 10.0, 100.0, 500.0,'character', 'tombstone', 48, game);
+        this.player.updateAlive(GameState.playerVariables[4]);
 
         // highscore state related buttons, background and text
         this.highscoreBackground = game.add.tileSprite(game.world.width/2, game.world.height/2 - 75, 300, 400, 'blankBackground');

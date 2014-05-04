@@ -9,10 +9,7 @@
  **/
 GameState.MainMenu = function () {
     this.background = null;
-    this.obstacles = null;
-    this.randomPlatforms = null;
-    this.floorAndRoof = null;
-    this.randomWalls = null;
+    this.music = null;
     this.player = null;
     this.playButton = null;
     this.tutorialButton = null;
@@ -46,8 +43,9 @@ GameState.MainMenu.prototype = {
         // World Object creation, has to be done each time in phaser, unfortunately can't pass objects
         // between states
         GameState.gameWorld.create(game);
-
-        this.player = new RunnerPC(GameState.playerPosition[0], GameState.playerPosition[1], GameState.playerPosition[2], 1.0, GameState.playerPosition[3], 10.0, 100.0, 500.0,'character', 48, game);
+        // Creating our player
+        this.player = new RunnerPC(GameState.playerVariables[0], GameState.playerVariables[1], GameState.playerVariables[2], 1.0, GameState.playerVariables[3], 10.0, 100.0, 500.0,'character', 'tombstone', 48, game);
+        this.player.updateAlive(GameState.playerVariables[4]);
 
         // menu buttons that on click call back the state switch functions created in main menu
         this.playButton = this.add.button(game.world.centerX - 60, game.world.centerY, 'playButtonSpriteSheet', this.enterGameState, this, 1, 0, 0, 0);
@@ -63,6 +61,7 @@ GameState.MainMenu.prototype = {
         this.title = game.add.text((game.world.width / 2), (game.world.height / 2) - 120, 'The \n Inversioning', { font: '32px Impact', fill: '#f00' });
         this.title.align = 'center';
         this.title.anchor.set(0.5, 0.5);
+        this.title.z = 1.0;
 
     },
 

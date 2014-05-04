@@ -56,6 +56,7 @@ function GameWorldManager(game, spaceBetweenWalls, platformSpriteWidth, wallSpri
  * @public
  */
 GameWorldManager.prototype.create = function(){
+
     // loops through all the positions we have and creates WorldObjects from them and adds them to groups for easy use and access by Phaser
     this.obstacles = game.add.group();
     for(var i = 0; i < this.obstaclePositions.length; i++)
@@ -169,6 +170,38 @@ GameWorldManager.prototype.reset = function(){
 };
 
 /**
+ * Function that saves all of the the GameWorldManagers WorldObjects positions to the internal position variables
+ * if we don't do this then when the states change the Groups that contain the WorldObject's internal image get deleted
+ * and we lose the position. We can still use its original position but we need there last known position for displaying
+ * them on screen through different states
+ * @public
+ * @function
+ */
+GameWorldManager.prototype.positionSave = function(){
+
+    this.floorAndRoofPositions = this.floorAndRoofPlacement(480);
+    for(i = 0; i < this.platforms.length; i++){
+        var current = this.platforms.getAt(i);
+        this.platformPositions[i][0] = current.position.x;
+    }
+
+    for(i = 0; i < this.obstacles.length; i++){
+        current = this.obstacles.getAt(i);
+        this.obstaclePositions[i][0] = current.position.x;
+    }
+
+    for(i = 0; i < this.walls.length; i++){
+        current = this.walls.getAt(i);
+        this.wallPositions[i][0] = current.position.x;
+    }
+
+    for(i = 0; i < this.floorAndRoof.length; i++){
+        current = this.floorAndRoof.getAt(i);
+        this.floorAndRoofPositions[i][0] = current.position.x;
+    }
+};
+
+/**
  * Function that updates all the WorldObjects Phaser Group's updates there x position constantly incase of speed boosts and repositions all of
  * them when they go off screen
  * @param {number} playerVelocityX - value that dictates the speed the world moves towards the player at should be the players current velocity on the X
@@ -190,8 +223,8 @@ GameWorldManager.prototype.update = function(playerVelocityX){
             // randomize the obstacle, similar to the obstaclesRandomiation function except that it bases
             // the minimum position off the last position of the newest positioned wall(wallIterator)
             var ranMax, ranMin;
-            ranMin = this.walls.getAt(this.wallIterator).position.x + this.obstacleWidth + Math.floor(this.obstaclesIterator / 2) * this.spaceBetweenWalls / (this.obstaclesPerRoom / 2);
-            ranMax = ranMin + (this.spaceBetweenWalls / this.obstaclesPerRoom) - (this.obstacleWidth + this.wallHalfWidth);
+            ranMin = this.walls.getAt(this.wallIterator).position.x + this.obstacleWidth + (Math.floor(this.obstaclesIterator / 2) * this.spaceBetweenWalls / (this.obstaclesPerRoom / 2));
+            ranMax = ranMin + (this.spaceBetweenWalls / (this.obstaclesPerRoom / 2)) - (this.obstacleWidth + this.wallHalfWidth);
 
             this.obstaclesIterator++;
 
@@ -360,7 +393,7 @@ GameWorldManager.prototype.obstacleRandomizer = function(topPosition, bottomPosi
             // and then negates the width of the wall and obstacle from it to get the "true" available space to that obstacle without it
             // touching another
             var ranMin = this.spaceBetweenWalls + spaceBetweenObjects + (i * this.spaceBetweenWalls / (this.obstaclesPerRoom / 2));
-            var ranMax = ranMin + (this.spaceBetweenWalls / this.obstaclesPerRoom) - (this.obstacleWidth + this.wallHalfWidth);
+            var ranMax = ranMin + (this.spaceBetweenWalls / (this.obstaclesPerRoom / 2)) - (this.obstacleWidth + this.wallHalfWidth);
 
             //(the spikes are centered so to avoid overlaps we must leave a space of 16 for each spike inbetween)
             positionsAndRotations[currentArrayPos] = []; // making the ith position an array as well making obstaclePositions a 2d array

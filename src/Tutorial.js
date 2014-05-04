@@ -11,10 +11,6 @@
  */
 GameState.Tutorial = function () {
     this.background = null;
-    this.obstacles = null;
-    this.randomPlatforms = null;
-    this.floorAndRoof = null;
-    this.randomWalls = null;
     this.player = null;
     this.backButton = null;
     this.tutorialImage = null;
@@ -38,7 +34,8 @@ GameState.Tutorial.prototype = {
         GameState.gameWorld.create(game);
 
         // create player
-        this.player = new RunnerPC(GameState.playerPosition[0], GameState.playerPosition[1], GameState.playerPosition[2], 1.0, GameState.playerPosition[3], 10.0, 100.0, 500.0,'character', 48, game);
+        this.player = new RunnerPC(GameState.playerVariables[0], GameState.playerVariables[1], GameState.playerVariables[2], 1.0, GameState.playerVariables[3], 10.0, 100.0, 500.0,'character', 'tombstone', 48, game);
+        this.player.updateAlive(GameState.playerVariables[4]);
 
         // create back button returns the player to the main menu
         this.backButton = this.add.button(400, 550, 'backButtonSpriteSheet', this.enterMainMenu, this, 1, 0, 0, 0);
